@@ -24,7 +24,10 @@ def env_bool(name, default=False):
 def env_list(name, default=""):
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
-DEBUG = env_bool("DJANGO_DEBUG", True)
+render_external_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+is_render_environment = bool(render_external_hostname)
+
+DEBUG = env_bool("DJANGO_DEBUG", not is_render_environment)
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or (
     "dev-only-" + get_random_secret_key() if DEBUG else None
 )
@@ -36,6 +39,13 @@ ALLOWED_HOSTS = env_list(
     "localhost,127.0.0.1,testserver,192.168.1.15" if DEBUG else "",
 )
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
+
+if render_external_hostname and render_external_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_external_hostname)
+
+render_external_origin = f"https://{render_external_hostname}" if render_external_hostname else ""
+if render_external_origin and render_external_origin not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(render_external_origin)
 
 
 INSTALLED_APPS = [
