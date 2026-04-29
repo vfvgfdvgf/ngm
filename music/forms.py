@@ -107,6 +107,8 @@ class ProfileForm(forms.ModelForm):
         image = self.cleaned_data.get(field_name)
         if not image:
             return image
+        if not hasattr(image, "content_type"):
+            return image
         if image.content_type not in ALLOWED_IMAGE_TYPES:
             raise ValidationError(f"صيغة {label} غير مدعومة.")
         if image.size > MAX_IMAGE_SIZE_MB * 1024 * 1024:
@@ -306,6 +308,8 @@ class SiteBrandingForm(forms.ModelForm):
     def _validate_uploaded_image(self, field_name, label):
         image = self.cleaned_data.get(field_name)
         if not image:
+            return image
+        if not hasattr(image, "content_type"):
             return image
         if image.content_type not in ALLOWED_IMAGE_TYPES:
             raise ValidationError(f"صيغة {label} غير مدعومة.")
