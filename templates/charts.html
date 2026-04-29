@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}الأكثر استماعًا • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">القائمة اليومية</div>
+      <h1>الأكثر استماعًا</h1>
+    </div>
+    <a class="button" href="{% url 'discover' %}">اكتشف</a>
+  </div>
+  <div class="list">
+    {% for track in tracks %}
+      {% include "partials/track_row.html" %}
+    {% empty %}
+      <div class="empty">لا توجد إحصاءات استماع حتى الآن.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=tracks_page %}
+</section>
+{% endblock %}

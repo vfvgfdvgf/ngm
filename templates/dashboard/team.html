@@ -1,0 +1,74 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}إدارة الموظفين{% endblock %}
+{% block dashboard_intro %}إدارة حسابات الفريق من داخل اللوحة الجديدة، مع إنشاء موظفين جدد ومراجعة الحسابات الإدارية والنشطة دون الرجوع للواجهة العامة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-primary">
+    <article class="dashboard-form-card">
+      <h3>إضافة حساب موظف</h3>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in staff_form %}
+          <label>
+            <span>{{ field.label }}</span>
+            {{ field }}
+            {% if field.help_text %}<small class="helptext">{{ field.help_text }}</small>{% endif %}
+            {{ field.errors }}
+          </label>
+        {% endfor %}
+        <button class="button primary" type="submit">إنشاء الحساب</button>
+      </form>
+    </article>
+
+    <article class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-admin-kicker">الفريق</span>
+          <h2>الحسابات الإدارية</h2>
+        </div>
+      </div>
+      <div class="dashboard-table">
+        {% for user in users_dashboard.staff_users %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ user.username }}</strong>
+              <p>{{ user.email|default:"بدون بريد ظاهر" }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if user.is_superuser %}مدير كامل{% else %}موظف{% endif %}</span>
+              <small>{% if user.last_login %}{{ user.last_login|date:"Y-m-d H:i" }}{% else %}لم يسجل الدخول بعد{% endif %}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد حسابات إدارية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-admin-kicker">الجدد</span>
+          <h2>أحدث المستخدمين</h2>
+        </div>
+      </div>
+      <div class="dashboard-table">
+        {% for user in users_dashboard.recent_users %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ user.username }}</strong>
+              <p>{{ user.email|default:"بدون بريد ظاهر" }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if user.is_staff %}موظف{% else %}عضو{% endif %}</span>
+              <small>{{ user.date_joined|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

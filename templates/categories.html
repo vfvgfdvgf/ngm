@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}التصنيفات • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <h1>التصنيفات</h1>
+  <div class="grid">
+    {% for category in categories %}
+      <a class="card" href="{% url 'category_detail' category.id %}">
+        <div class="art">
+          {% if category.cover %}
+            <img src="{{ category.cover.url }}" alt="{{ category.name }}">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-tags" label="صورة التصنيف" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ category.name }}</h3>
+        <p class="muted">{{ category.track_count }} مقطع</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا توجد تصنيفات بعد.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=categories_page %}
+</section>
+{% endblock %}

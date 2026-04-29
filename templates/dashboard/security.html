@@ -1,0 +1,93 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}الحماية والتنبيهات{% endblock %}
+{% block dashboard_intro %}مراقبة محاولات الفحص، أبرز الـ IPs المزعجة، المسارات المستهدفة، وحالات الحظر النشطة حتى يكون رد الفعل أسرع وأوضح.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الحظر</span><h2>عناوين محظورة الآن</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for block in security_dashboard.active_blocks %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong class="mono">{{ block.ip_address }}</strong>
+              <p class="muted">{{ block.reason }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>نشط</span>
+              <small>{{ block.expires_at|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا يوجد حظر نشط حاليًا.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المهاجمون</span><h2>أكثر IPs إثارة للتنبيه</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in security_dashboard.top_attackers %}
+          <div class="dashboard-list-row"><strong>{{ row.ip_address }}</strong><span>{{ row.total }} حدث</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد أحداث كافية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المسارات المستهدفة</span><h2>أكثر الوجهات فحصًا</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in security_dashboard.common_paths %}
+          <div class="dashboard-list-row"><strong>{{ row.path }}</strong><span>{{ row.total }} محاولة</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد مسارات مستهدفة مسجلة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الخطورة</span><h2>توزيع مستويات التنبيه</h2></div>
+      </div>
+      <div class="dashboard-list">
+        {% for row in security_dashboard.severity_breakdown %}
+          <div class="dashboard-list-row"><strong>{{ row.severity }}</strong><span>{{ row.total }} حدث</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات خطورة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">السجل</span><h2>أحدث التنبيهات الأمنية</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for event in security_dashboard.recent_events %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ event.reason }}</strong>
+              <p class="muted mono">{{ event.ip_address }} • {{ event.path }}</p>
+            </div>
+            <div class="dashboard-status {{ event.severity }}">
+              <span>{{ event.get_severity_display }}</span>
+              <small>{{ event.created_at|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد أحداث أمنية حديثة.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

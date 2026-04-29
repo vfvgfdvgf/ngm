@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>{{ site_base_url }}{% url 'home' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'discover' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'community' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'charts' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'artists' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'albums' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'categories' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'playlists' %}</loc></url>
+  <url><loc>{{ site_base_url }}{% url 'legal_pages' %}</loc></url>
+  {% for archive in search_archives %}
+    <url><loc>{{ site_base_url }}{{ archive.url }}</loc></url>
+  {% endfor %}
+  {% for track in tracks %}
+    <url><loc>{{ site_base_url }}{% url 'track_detail' track.id %}</loc><lastmod>{{ track.updated_at|date:"Y-m-d" }}</lastmod></url>
+  {% endfor %}
+  {% for artist in artists %}
+    <url><loc>{{ site_base_url }}{% url 'artist_detail' artist.id %}</loc></url>
+  {% endfor %}
+  {% for album in albums %}
+    <url><loc>{{ site_base_url }}{% url 'album_detail' album.id %}</loc></url>
+  {% endfor %}
+  {% for page in legal_pages %}
+    <url><loc>{{ site_base_url }}{% url 'legal_page_detail' page.slug %}</loc><lastmod>{{ page.updated_at|date:"Y-m-d" }}</lastmod></url>
+  {% endfor %}
+  {% for comment in track_comments %}
+    <url><loc>{{ site_base_url }}{% url 'track_comment_detail' comment.id %}</loc><lastmod>{{ comment.created_at|date:"Y-m-d" }}</lastmod></url>
+  {% endfor %}
+  {% for comment in post_comments %}
+    <url><loc>{{ site_base_url }}{% url 'post_comment_detail' comment.id %}</loc><lastmod>{{ comment.created_at|date:"Y-m-d" }}</lastmod></url>
+  {% endfor %}
+</urlset>

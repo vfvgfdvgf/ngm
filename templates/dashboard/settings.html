@@ -1,0 +1,67 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}الإعدادات العامة{% endblock %}
+{% block dashboard_intro %}حالة هوية المنصة والتهيئة العامة للموقع، مع معاينة مباشرة للشعار وfavicon وروابط سريعة لتعديلها من لوحة الإدارة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-kpis">
+    <article class="dashboard-kpi glass-panel"><span>صفحات SEO</span><strong>{{ settings_dashboard.counts.seo_pages }}</strong><small>إعدادات مؤرشفة</small></article>
+    <article class="dashboard-kpi glass-panel"><span>البنرات</span><strong>{{ settings_dashboard.counts.banners }}</strong><small>صفحات لها رأس مخصص</small></article>
+    <article class="dashboard-kpi glass-panel"><span>الصفحات القانونية</span><strong>{{ settings_dashboard.counts.legal_pages }}</strong><small>قوانين وسياسات</small></article>
+    <article class="dashboard-kpi glass-panel"><span>الأسئلة الشائعة</span><strong>{{ settings_dashboard.counts.faqs }}</strong><small>محتوى مساند</small></article>
+    <article class="dashboard-kpi glass-panel danger"><span>الإعلانات</span><strong>{{ settings_dashboard.counts.announcements }}</strong><small>رسائل تشغيلية</small></article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الهوية</span><h2>بيانات الموقع</h2></div></div>
+      <div class="dashboard-insight-list">
+        <div class="dashboard-insight-row"><span>اسم الموقع</span><strong>{{ settings_dashboard.site_settings.site_name }}</strong></div>
+        <div class="dashboard-insight-row"><span>الشعار النصي</span><strong>{{ settings_dashboard.site_settings.tagline }}</strong></div>
+        <div class="dashboard-insight-row"><span>شعار الموقع</span><strong>{% if settings_dashboard.health.logo_ready %}مرفوع{% else %}غير مرفوع{% endif %}</strong></div>
+        <div class="dashboard-insight-row"><span>Favicon</span><strong>{% if settings_dashboard.health.favicon_ready %}مرفوع{% else %}غير مرفوع{% endif %}</strong></div>
+        <div class="dashboard-insight-row"><span>زر الهيدر</span><strong>{{ settings_dashboard.health.header_cta_label }}</strong></div>
+        <div class="dashboard-insight-row"><span>رابط الزر</span><strong class="mono">{{ settings_dashboard.health.header_cta_url }}</strong></div>
+      </div>
+      <div class="dashboard-actions-row">
+        <a class="dashboard-button primary" href="{{ settings_dashboard.health.branding_admin_url }}">تعديل الشعار و Favicon</a>
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الحالة</span><h2>فحوص سريعة</h2></div></div>
+      <div class="dashboard-insight-list">
+        <div class="dashboard-insight-row"><span>Analytics</span><strong>{% if settings_dashboard.health.analytics_connected %}مفعل{% else %}غير مفعل{% endif %}</strong></div>
+        <div class="dashboard-insight-row"><span>الرابط القانوني</span><strong class="mono">{{ settings_dashboard.health.canonical_domain }}</strong></div>
+        <div class="dashboard-insight-row"><span>صورة OG</span><strong>{% if settings_dashboard.health.og_image_ready %}جاهزة{% else %}غير مرفوعة{% endif %}</strong></div>
+        <div class="dashboard-insight-row"><span>رسالة الصيانة</span><strong>{{ settings_dashboard.health.maintenance_message }}</strong></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">المعاينة</span><h2>هوية المنصة</h2></div></div>
+      <div class="dashboard-media-grid">
+        <div class="dashboard-media-card">
+          <span>شعار الموقع</span>
+          {% if settings_dashboard.site_settings.logo %}
+            <img src="{{ settings_dashboard.site_settings.logo.url }}" alt="{{ settings_dashboard.site_settings.site_name }}">
+          {% else %}
+            <strong>{{ settings_dashboard.site_settings.site_name|slice:":1" }}</strong>
+          {% endif %}
+        </div>
+        <div class="dashboard-media-card favicon">
+          <span>Favicon</span>
+          {% if settings_dashboard.site_settings.favicon %}
+            <img src="{{ settings_dashboard.site_settings.favicon.url }}" alt="Favicon">
+          {% elif settings_dashboard.site_settings.logo %}
+            <img src="{{ settings_dashboard.site_settings.logo.url }}" alt="{{ settings_dashboard.site_settings.site_name }}">
+          {% else %}
+            <strong>{{ settings_dashboard.site_settings.site_name|slice:":1" }}</strong>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+  </section>
+{% endblock %}

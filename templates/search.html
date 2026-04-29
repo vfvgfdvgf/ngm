@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="detail-panel">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">البحث</div>
+      <h1>ابحث داخل نغم</h1>
+    </div>
+  </div>
+
+  <form class="filters" method="get">
+    <input type="search" name="q" value="{{ query }}" placeholder="عنوان، منشد، ألبوم، كلمات">
+    <select name="category">
+      <option value="">كل التصنيفات</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}" {% if category_id == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="mood">
+      <option value="">كل الأجواء</option>
+      {% for key, label in moods %}
+        <option value="{{ key }}" {% if mood == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="sort">
+      <option value="relevant" {% if sort == "relevant" %}selected{% endif %}>الأقرب</option>
+      <option value="popular" {% if sort == "popular" %}selected{% endif %}>الأكثر استماعًا</option>
+      <option value="latest" {% if sort == "latest" %}selected{% endif %}>الأحدث</option>
+    </select>
+    <select name="duration">
+      <option value="">كل المدد</option>
+      {% for duration_value, duration_label in duration_options %}
+        <option value="{{ duration_value }}" {% if duration_bucket == duration_value %}selected{% endif %}>{{ duration_label }}</option>
+      {% endfor %}
+    </select>
+    <button class="button primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> بحث</button>
+  </form>
+  <div class="search-toolbar">
+    <p class="muted">ابحث أو تصفح حسب المزاج والتصنيف، ثم رتّب النتائج بالطريقة التي تناسبك.</p>
+    {% if query or mood or category_id %}
+      <a class="button ghost compact" href="{% url 'search' %}"><i class="fa-solid fa-rotate-left"></i> تصفير الفلاتر</a>
+    {% endif %}
+  </div>
+</section>
+
+{% if mood_spotlights %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">اختصارات سريعة</div>
+      <h2>ابدأ من مزاج جاهز</h2>
+    </div>
+  </div>
+  <div class="pill-row">
+    {% for spotlight in mood_spotlights %}
+      <a class="pill-link" href="?mood={{ spotlight.slug }}&sort=popular">
+        <span>{{ spotlight.label }}</span>
+        <strong>{{ spotlight.count }}</strong>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if query %}
+<section class="section">
+  <div class="results-overview">
+    {% if search_collections.artists %}
+      <div class="detail-panel">
+        <div class="section-title section-title-compact">
+          <h3>فنانون</h3>
+          <a class="button ghost compact" href="{% url 'artists' %}">كل الفنانين</a>
+        </div>
+        <div class="compact-grid">
+          {% for artist in search_collections.artists %}
+            <a class="card compact-card" href="{% url 'artist_detail' artist.id %}">
+              <strong>{{ artist.name }}</strong>
+              <span class="muted">{{ artist.track_count }} مقطع • {{ artist.followers_count }} متابع</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if search_collections.albums %}
+      <div class="detail-panel">
+        <div class="section-title section-title-compact">
+          <h3>ألبومات</h3>
+          <a class="button ghost compact" href="{% url 'albums' %}">كل الألبومات</a>
+        </div>
+        <div class="compact-grid">
+          {% for album in search_collections.albums %}
+            <a class="card compact-card" href="{% url 'album_detail' album.id %}">
+              <strong>{{ album.title }}</strong>
+              <span class="muted">{{ album.artist.name }} • {{ album.tracks_count }} مقطع</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if search_collections.playlists %}
+      <div class="detail-panel">
+        <div class="section-title section-title-compact">
+          <h3>قوائم</h3>
+          <a class="button ghost compact" href="{% url 'playlists' %}">كل القوائم</a>
+        </div>
+        <div class="compact-grid">
+          {% for playlist in search_collections.playlists %}
+            <a class="card compact-card" href="{% url 'playlist_detail' playlist.id %}">
+              <strong>{{ playlist.name }}</strong>
+              <span class="muted">{{ playlist.user.username }} • {{ playlist.tracks_count }} مقطع</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if search_collections.categories %}
+      <div class="detail-panel">
+        <div class="section-title section-title-compact">
+          <h3>تصنيفات</h3>
+          <a class="button ghost compact" href="{% url 'categories' %}">كل التصنيفات</a>
+        </div>
+        <div class="compact-grid">
+          {% for category in search_collections.categories %}
+            <a class="card compact-card" href="{% url 'category_detail' category.id %}">
+              <strong>{{ category.name }}</strong>
+              <span class="muted">{{ category.track_count }} مقطع</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  {% if query %}
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">النتائج</div>
+        <h2>نتائج "{{ query }}"</h2>
+      </div>
+      <span class="badge">{{ results_page.paginator.count }} نتيجة</span>
+    </div>
+  {% elif mood or category_id %}
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">تصفح مفلتر</div>
+        <h2>نتائج حسب الفلاتر المختارة</h2>
+      </div>
+      <span class="badge">{{ results_page.paginator.count }} نتيجة</span>
+    </div>
+  {% else %}
+    <div class="section-title">
+      <div>
+        <div class="eyebrow">اكتشاف</div>
+        <h2>مقاطع جاهزة للتصفح</h2>
+      </div>
+      <span class="badge">{{ results_page.paginator.count }} مقطع</span>
+    </div>
+  {% endif %}
+  <div class="grid">
+    {% for track in results %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">{% if query %}لا توجد نتائج مطابقة. جرّب كلمات أدق أو غيّر الفلاتر.{% else %}ابدأ بكتابة اسم مقطع أو فنان أو كلمات من النص.{% endif %}</div>
+    {% endfor %}
+  </div>
+  {% if results_page and results_page.has_other_pages %}
+    <nav class="pagination" aria-label="نتائج البحث">
+      {% if results_page.has_previous %}
+        <a class="button ghost" href="?q={{ query|urlencode }}&mood={{ mood|urlencode }}&category={{ category_id|urlencode }}&sort={{ sort|urlencode }}&duration={{ duration_bucket|urlencode }}&page={{ results_page.previous_page_number }}">السابق</a>
+      {% endif %}
+      <span class="muted">صفحة {{ results_page.number }} من {{ results_page.paginator.num_pages }}</span>
+      {% if results_page.has_next %}
+        <a class="button ghost" href="?q={{ query|urlencode }}&mood={{ mood|urlencode }}&category={{ category_id|urlencode }}&sort={{ sort|urlencode }}&duration={{ duration_bucket|urlencode }}&page={{ results_page.next_page_number }}">التالي</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% if banners %}
+<section class="banner-slot banner-slot-{{ slot_name }}">
+  <div class="banner-slot-grid">
+    {% for banner in banners %}
+    <article class="page-banner banner-size-{{ banner.size }} {% if banner.image_url %}has-image{% endif %}" {% if banner.image_url %}style="background-image: url('{{ banner.image_url }}');"{% endif %}>
+      <div class="page-banner-copy">
+        {% if banner.eyebrow %}
+          <div class="eyebrow">{{ banner.eyebrow }}</div>
+        {% endif %}
+        {% if banner.title %}
+          <h2>{{ banner.title }}</h2>
+        {% endif %}
+        {% if banner.description %}
+          <p>{{ banner.description }}</p>
+        {% endif %}
+        {% if banner.primary_label and banner.primary_url or banner.secondary_label and banner.secondary_url %}
+          <div class="actions">
+            {% if banner.primary_label and banner.primary_url %}
+              <a class="button primary" href="{{ banner.primary_url }}">{{ banner.primary_label }}</a>
+            {% endif %}
+            {% if banner.secondary_label and banner.secondary_url %}
+              <a class="button" href="{{ banner.secondary_url }}">{{ banner.secondary_label }}</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

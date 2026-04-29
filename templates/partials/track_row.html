@@ -1,0 +1,47 @@
+<article class="media-row track-row">
+  <a class="art" href="{% url 'track_detail' track.id %}">
+    {% if track.cover %}
+      <img src="{{ track.cover.url }}" alt="{{ track.title }}" loading="lazy" decoding="async">
+    {% else %}
+      {% include "partials/media_placeholder.html" with icon="fa-microphone" label="بدون غلاف" extra_class="mini" %}
+    {% endif %}
+  </a>
+
+  <div class="track-row-copy">
+    <strong><a href="{% url 'track_detail' track.id %}">{{ track.title }}</a></strong>
+    <div class="muted truncate">{{ track.artist.name }}{% if track.album %} • {{ track.album.title }}{% endif %}</div>
+    <div class="track-row-meta">
+      {% if track.category %}<span class="badge">{{ track.category.name }}</span>{% endif %}
+      {% if track.mood %}<span class="badge">{{ track.get_mood_display }}</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="actions track-row-actions">
+    <button
+      class="icon-button"
+      type="button"
+      data-player-track
+      data-track-id="{{ track.id }}"
+      data-track-title="{{ track.title }}"
+      data-track-artist="{{ track.artist.name }}"
+      data-track-src="{{ track.audio_file.url }}"
+      data-track-art="{% if track.cover %}{{ track.cover.url }}{% endif %}"
+      aria-label="تشغيل {{ track.title }}"
+    >
+      <i class="fa-solid fa-play"></i>
+    </button>
+    <button
+      class="icon-button"
+      type="button"
+      data-share-url="{% url 'track_detail' track.id %}"
+      data-share-title="{{ track.title }} - {{ track.artist.name }}"
+      data-share-track-id="{{ track.id }}"
+      aria-label="مشاركة {{ track.title }}"
+      title="مشاركة"
+    >
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+    </button>
+    <span class="badge"><i class="fa-regular fa-eye"></i> {{ track.views }}</span>
+    <span class="badge"><i class="fa-regular fa-clock"></i> {{ track.duration_label }}</span>
+  </div>
+</article>

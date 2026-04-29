@@ -1,0 +1,208 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}مركز قيادة نغم{% endblock %}
+{% block dashboard_intro %}نظرة تنفيذية سريعة على المنصة، مع مؤشرات الزوار، سرعة الصفحات، حالة المجتمع، ونقاط الإدارة الأكثر احتياجًا للمتابعة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-panel">
+    <div class="dashboard-panel-head">
+      <div>
+        <span class="dashboard-admin-kicker">روابط سريعة</span>
+        <h2>صفحات الإدارة الجديدة</h2>
+      </div>
+    </div>
+    <div class="dashboard-catalog-grid">
+      {% for item in dashboard_sections %}
+        {% if item.url != request.path %}
+          <a class="dashboard-catalog-card dashboard-page-link-card" href="{{ item.url }}">
+            <h3><i class="fa-solid {{ item.icon }}"></i> {{ item.label }}</h3>
+            <p class="dashboard-admin-intro">انتقال مباشر إلى {{ item.label }}</p>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="dashboard-kpis">
+    <article class="dashboard-kpi glass-panel">
+      <span>زيارات 7 أيام</span>
+      <strong>{{ dashboard.overview.visits_week }}</strong>
+      <small>{{ dashboard.overview.unique_ips_week }} IP فريد</small>
+    </article>
+    <article class="dashboard-kpi glass-panel">
+      <span>زيارات 30 يومًا</span>
+      <strong>{{ dashboard.overview.visits_month }}</strong>
+      <small>الصورة العامة للنمو</small>
+    </article>
+    <article class="dashboard-kpi glass-panel">
+      <span>الأعضاء النشطون</span>
+      <strong>{{ dashboard.overview.signed_in_visitors }}</strong>
+      <small>دخلوا بحساباتهم هذا الأسبوع</small>
+    </article>
+    <article class="dashboard-kpi glass-panel">
+      <span>طلبات الموظفين</span>
+      <strong>{{ dashboard.overview.staff_requests_week }}</strong>
+      <small>حركة داخلية خلال 7 أيام</small>
+    </article>
+    <article class="dashboard-kpi glass-panel danger">
+      <span>يوم الذروة</span>
+      <strong>{% if dashboard.overview.peak_day %}{{ dashboard.overview.peak_day.visits }}{% else %}0{% endif %}</strong>
+      <small>{% if dashboard.overview.peak_day %}{{ dashboard.overview.peak_day.label }}{% else %}لا توجد بيانات{% endif %}</small>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">مركز التحسين</span>
+          <h2>صحة المنصة الآن</h2>
+        </div>
+        <span class="dashboard-badge">Score {{ dashboard.health_center.overall_score }}/100</span>
+      </div>
+      <div class="dashboard-stat-grid">
+        <div><span>الأداء</span><strong>{{ dashboard.health_center.performance_score }}</strong></div>
+        <div><span>SEO</span><strong>{{ dashboard.health_center.seo_score }}</strong></div>
+        <div><span>الوسائط</span><strong>{{ dashboard.health_center.media_score }}</strong></div>
+        <div><span>أخطاء 5xx</span><strong>{{ dashboard.health_center.metrics.server_errors_week }}</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">أولوية التنفيذ</span>
+          <h2>خطوات سريعة مقترحة</h2>
+        </div>
+      </div>
+      <div class="dashboard-list">
+        {% for item in dashboard.health_center.next_steps %}
+          <div class="dashboard-list-row">
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.detail }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-primary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">الأداء اليومي</span>
+          <h2>اتجاه الزيارات</h2>
+        </div>
+        <span class="dashboard-badge">30 يومًا</span>
+      </div>
+      <div class="dashboard-chart">
+        {% for item in dashboard.trend_cards %}
+          <div class="dashboard-chart-col" title="{{ item.label }} - {{ item.visits }} زيارة">
+            <span class="dashboard-chart-value">{{ item.visits }}</span>
+            <div class="dashboard-chart-bar-shell">
+              <span class="dashboard-chart-bar" style="height: {{ item.height }}%"></span>
+            </div>
+            <small>{{ item.label }}</small>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات زيارات كافية حتى الآن.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">لقطة سريعة</span>
+          <h2>أهم المؤشرات</h2>
+        </div>
+      </div>
+      <div class="dashboard-insight-list">
+        <div class="dashboard-insight-row">
+          <span>أكثر دولة زيارة</span>
+          <strong>{% if dashboard.overview.top_country %}{{ dashboard.overview.top_country.country_code }} - {{ dashboard.overview.top_country.total }}{% else %}غير متاح{% endif %}</strong>
+        </div>
+        <div class="dashboard-insight-row">
+          <span>أكثر IP زيارة</span>
+          <strong class="mono">{% if dashboard.overview.top_ip %}{{ dashboard.overview.top_ip.ip_address }}{% else %}غير متاح{% endif %}</strong>
+        </div>
+        <div class="dashboard-insight-row">
+          <span>الصفحة الأكثر حضورًا</span>
+          <strong class="mono">{% if dashboard.overview.top_page %}{{ dashboard.overview.top_page.path }}{% else %}غير متاح{% endif %}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">المحتوى</span>
+          <h2>حجم المنصة</h2>
+        </div>
+      </div>
+      <div class="dashboard-stat-grid">
+        <div><span>المقاطع</span><strong>{{ dashboard.content.tracks }}</strong></div>
+        <div><span>الفنانون</span><strong>{{ dashboard.content.artists }}</strong></div>
+        <div><span>الألبومات</span><strong>{{ dashboard.content.albums }}</strong></div>
+        <div><span>القوائم</span><strong>{{ dashboard.content.playlists }}</strong></div>
+        <div><span>الأعضاء</span><strong>{{ dashboard.content.users }}</strong></div>
+        <div><span>منشورات المجتمع</span><strong>{{ dashboard.content.posts }}</strong></div>
+        <div><span>تعليقات المقاطع</span><strong>{{ dashboard.content.track_comments }}</strong></div>
+        <div><span>تعليقات المنشورات</span><strong>{{ dashboard.content.post_comments }}</strong></div>
+        <div><span>تشغيلات الأسبوع</span><strong>{{ dashboard.content.plays_week }}</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">الحماية</span>
+          <h2>آخر التنبيهات</h2>
+        </div>
+      </div>
+      <div class="dashboard-table">
+        {% for event in dashboard.recent_security_events|slice:":6" %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ event.reason }}</strong>
+              <p class="muted mono">{{ event.ip_address }} • {{ event.path }}</p>
+            </div>
+            <div class="dashboard-status {{ event.severity }}">
+              <span>{{ event.get_severity_display }}</span>
+              <small>{{ event.created_at|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد أحداث حماية حديثة.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">الحركة المباشرة</span>
+          <h2>آخر الزيارات</h2>
+        </div>
+      </div>
+      <div class="dashboard-table">
+        {% for visit in dashboard.recent_visits|slice:":6" %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong class="mono">{{ visit.path }}</strong>
+              <p class="muted mono">{{ visit.ip_address }}{% if visit.country_code %} • {{ visit.country_code }}{% endif %}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ visit.response_ms }}ms</span>
+              <small>{{ visit.visited_at|date:"H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد زيارات مسجلة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

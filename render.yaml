@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: nagham
+    env: python
+    plan: free
+    rootDir: nagham
+    buildCommand: ./build.sh
+    startCommand: gunicorn nagham.wsgi:application
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "nagham.onrender.com"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://nagham.onrender.com"
+      - key: DJANGO_TRUST_X_FORWARDED_PROTO
+        value: "1"
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "1"
+      - key: DJANGO_SESSION_COOKIE_SECURE
+        value: "1"
+      - key: DJANGO_CSRF_COOKIE_SECURE
+        value: "1"
+      - key: DJANGO_SECURE_HSTS_SECONDS
+        value: "31536000"
+      - key: DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS
+        value: "1"
+      - key: DJANGO_SECURE_HSTS_PRELOAD
+        value: "1"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+databases:
+  - name: nagham-db
+    plan: free

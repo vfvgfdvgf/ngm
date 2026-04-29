@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}الألبومات • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <h1>الألبومات</h1>
+    <a class="button" href="{% url 'artists' %}">الفنانون</a>
+  </div>
+  <div class="grid">
+    {% for album in albums %}
+      <a class="card" href="{% url 'album_detail' album.id %}">
+        <div class="art">
+          {% if album.cover %}
+            <img src="{{ album.cover.url }}" alt="{{ album.title }}">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-compact-disc" label="غلاف الألبوم" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ album.title }}</h3>
+        <p class="muted">{{ album.artist.name }} • {{ album.tracks_count }} مقطع</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا توجد ألبومات بعد.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=albums_page %}
+</section>
+{% endblock %}

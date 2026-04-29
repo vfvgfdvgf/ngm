@@ -1,0 +1,100 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}SEO والمحتوى الثابت{% endblock %}
+{% block dashboard_intro %}متابعة إعدادات السيو، الصفحات المؤرشفة، البنرات، التنبيهات، والصفحات التي ما زالت تحتاج إعداد SEO صريح داخل المشروع.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-kpis">
+    <article class="dashboard-kpi glass-panel"><span>صفحات SEO</span><strong>{{ seo_dashboard.counts.seo_pages }}</strong><small>إعدادات مخصصة</small></article>
+    <article class="dashboard-kpi glass-panel"><span>صفحات noindex</span><strong>{{ seo_dashboard.counts.noindex_pages }}</strong><small>غير مؤرشفة</small></article>
+    <article class="dashboard-kpi glass-panel"><span>البنرات</span><strong>{{ seo_dashboard.counts.banners }}</strong><small>رؤوس الصفحات</small></article>
+    <article class="dashboard-kpi glass-panel"><span>الصفحات القانونية</span><strong>{{ seo_dashboard.counts.legal_pages }}</strong><small>نصوص ثابتة</small></article>
+    <article class="dashboard-kpi glass-panel danger"><span>الإعلانات</span><strong>{{ seo_dashboard.counts.announcements }}</strong><small>رسائل نشطة ومؤرشفة</small></article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">Checklist</span><h2>فحوص SEO السريعة</h2></div></div>
+      <div class="dashboard-list">
+        {% for row in seo_dashboard.health_checks %}
+          <div class="dashboard-list-row">
+            <strong>{{ row.label }}</strong>
+            <span>{{ row.detail }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">Opportunities</span><h2>فرص التحسين الحالية</h2></div></div>
+      <div class="dashboard-list">
+        {% for row in seo_dashboard.opportunities %}
+          <div class="dashboard-list-row">
+            <strong>{{ row.title }}</strong>
+            <span>{{ row.detail }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الإعدادات العامة</span><h2>هوية الموقع</h2></div></div>
+      <div class="dashboard-insight-list">
+        <div class="dashboard-insight-row"><span>اسم الموقع</span><strong>{{ seo_dashboard.site_settings.site_name }}</strong></div>
+        <div class="dashboard-insight-row"><span>العنوان الافتراضي</span><strong>{{ seo_dashboard.site_settings.default_title }}</strong></div>
+        <div class="dashboard-insight-row"><span>الرابط القانوني</span><strong class="mono">{{ seo_dashboard.site_settings.canonical_domain|default:"غير محدد" }}</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">نواقص</span><h2>صفحات بلا إعداد SEO</h2></div></div>
+      <div class="dashboard-list">
+        {% for row in seo_dashboard.missing_pages %}
+          <div class="dashboard-list-row"><strong>{{ row.label }}</strong><span class="mono">{{ row.key }}</span></div>
+        {% empty %}
+          <div class="dashboard-empty">كل الصفحات المعرفة تملك إعداد SEO مخصصًا.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الصفحات</span><h2>إعدادات SEO الحالية</h2></div></div>
+      <div class="dashboard-table">
+        {% for row in seo_dashboard.seo_pages %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ row.get_page_key_display }}</strong>
+              <p class="muted">{{ row.browser_title }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if row.noindex %}noindex{% else %}index{% endif %}</span>
+              <small>{{ row.updated_at|date:"Y-m-d" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد صفحات SEO معرفة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">البنرات</span><h2>رؤوس الصفحات</h2></div></div>
+      <div class="dashboard-table">
+        {% for row in seo_dashboard.banner_pages %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ row.get_page_key_display }}</strong>
+              <p class="muted">{{ row.title }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if row.is_active %}نشط{% else %}متوقف{% endif %}</span>
+              <small>{{ row.updated_at|date:"Y-m-d" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بنرات معرفة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

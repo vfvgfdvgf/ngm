@@ -1,0 +1,92 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}استوديو إضافة المحتوى{% endblock %}
+{% block dashboard_intro %}إنشاء مقاطع وفنانين وألبومات وتصنيفات ومحتوى ثابت مباشرة من داخل لوحة الإدارة، مع واجهة أبسط وأسرع من الإدارة التقليدية.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-studio-grid">
+    <article class="dashboard-form-card">
+      <h3>إضافة تصنيف</h3>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="category">
+        {% for field in studio_forms.category %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ التصنيف</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة فنان</h3>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="artist">
+        {% for field in studio_forms.artist %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ الفنان</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة ألبوم</h3>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="album">
+        {% for field in studio_forms.album %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ الألبوم</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة مقطع</h3>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="track">
+        {% for field in studio_forms.track %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ المقطع</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة إعلان</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="announcement">
+        {% for field in studio_forms.announcement %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ الإعلان</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة سؤال شائع</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="faq">
+        {% for field in studio_forms.faq %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ السؤال</button>
+      </form>
+    </article>
+
+    <article class="dashboard-form-card">
+      <h3>إضافة صفحة قانونية</h3>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="dashboard_form" value="legal">
+        {% for field in studio_forms.legal %}
+          <label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>
+        {% endfor %}
+        <button class="button primary" type="submit">حفظ الصفحة</button>
+      </form>
+    </article>
+  </section>
+{% endblock %}

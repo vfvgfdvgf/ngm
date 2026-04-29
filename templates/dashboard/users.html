@@ -1,0 +1,78 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}المستخدمون والفِرق{% endblock %}
+{% block dashboard_intro %}متابعة الأعضاء الجدد، الحسابات الإدارية، أكثر الملفات نشاطًا، ومؤشرات اكتمال الملفات الشخصية داخل المنصة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-kpis">
+    <article class="dashboard-kpi glass-panel"><span>إجمالي المستخدمين</span><strong>{{ users_dashboard.totals.all_users }}</strong><small>كل الحسابات</small></article>
+    <article class="dashboard-kpi glass-panel"><span>الجدد خلال 30 يومًا</span><strong>{{ users_dashboard.totals.new_users_month }}</strong><small>حسابات حديثة</small></article>
+    <article class="dashboard-kpi glass-panel"><span>الموظفون</span><strong>{{ users_dashboard.totals.staff_users }}</strong><small>حسابات staff</small></article>
+    <article class="dashboard-kpi glass-panel"><span>المديرون</span><strong>{{ users_dashboard.totals.superusers }}</strong><small>صلاحية كاملة</small></article>
+    <article class="dashboard-kpi glass-panel danger"><span>ملفات مكتملة</span><strong>{{ users_dashboard.totals.profiles_completed }}</strong><small>لديها اسم عرض</small></article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الانضمام</span><h2>أحدث المستخدمين</h2></div></div>
+      <div class="dashboard-table">
+        {% for user in users_dashboard.recent_users %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ user.username }}</strong>
+              <p class="muted">{{ user.email|default:"بدون بريد ظاهر" }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if user.is_staff %}موظف{% else %}عضو{% endif %}</span>
+              <small>{{ user.date_joined|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد حسابات حديثة.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">النشاط</span><h2>أكثر الملفات حضورًا</h2></div></div>
+      <div class="dashboard-table">
+        {% for profile in users_dashboard.top_profiles %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ profile.name }}</strong>
+              <p class="muted">@{{ profile.user.username }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ profile.posts_total }} منشور</span>
+              <small>{{ profile.comments_total }} تعليق</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد ملفات نشطة كفاية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الفريق</span><h2>الحسابات الإدارية</h2></div></div>
+      <div class="dashboard-table">
+        {% for user in users_dashboard.staff_users %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ user.username }}</strong>
+              <p class="muted">{{ user.email|default:"بدون بريد ظاهر" }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{% if user.is_superuser %}مدير كامل{% else %}موظف{% endif %}</span>
+              <small>{% if user.last_login %}{{ user.last_login|date:"Y-m-d H:i" }}{% else %}لم يسجل الدخول بعد{% endif %}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد حسابات staff.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

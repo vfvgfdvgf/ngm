@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}المفضلة • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <h1>المفضلة</h1>
+    <a class="button" href="{% url 'discover' %}">اكتشف مقاطع جديدة</a>
+  </div>
+  {% if user.is_authenticated %}
+    <div class="grid">
+      {% for track in tracks %}
+        {% include "partials/track_card.html" %}
+      {% empty %}
+        <div class="empty">لم تضف أي مقطع إلى المفضلة بعد.</div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">سجل الدخول حتى تحفظ مفضلتك وتراها من أي مكان.</div>
+  {% endif %}
+</section>
+{% endblock %}

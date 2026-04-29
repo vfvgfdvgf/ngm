@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">الثقة والشفافية</div>
+      <h1>الصفحات القانونية</h1>
+      <p class="muted">كل الصفحات يمكن إنشاؤها وتعديلها ونشرها من لوحة التحكم.</p>
+    </div>
+  </div>
+  <div class="grid">
+    {% for page in pages %}
+      <a class="card" href="{% url 'legal_page_detail' page.slug %}">
+        <div class="art">{% include "partials/media_placeholder.html" with icon="fa-file-shield" label="صفحة قانونية" extra_class="compact" %}</div>
+        <h3>{{ page.title }}</h3>
+        <p class="muted">{{ page.summary|default:"صفحة قانونية من إدارة نغم." }}</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا توجد صفحات قانونية منشورة بعد. أنشئها من لوحة التحكم.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section detail-panel">
+  <h2>الأسئلة الشائعة</h2>
+  <div class="faq-list">
+    {% for faq in faqs %}
+      <details>
+        <summary>{{ faq.question }}</summary>
+        <p>{{ faq.answer }}</p>
+      </details>
+    {% empty %}
+      <p class="muted">أضف الأسئلة الشائعة من لوحة التحكم لتظهر هنا.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

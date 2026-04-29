@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section profile-hero-card">
+  <div class="profile-cover" {% if profile.banner_image %}style="background-image: linear-gradient(135deg, rgba(95, 23, 43, 0.72), rgba(236, 223, 201, 0.22)), url('{{ profile.banner_image.url }}');"{% endif %}></div>
+  <div class="profile-hero-inner">
+    <div class="profile-avatar hero">
+      {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
+      {% else %}
+        {% include "partials/media_placeholder.html" with icon="fa-user" label="الصورة الشخصية" extra_class="compact" %}
+      {% endif %}
+    </div>
+    <div class="profile-meta">
+      <h2>{{ profile.name|default:profile_user.username }}</h2>
+      <p class="muted">@{{ profile_user.username }}</p>
+      {% if profile.bio %}<p>{{ profile.bio }}</p>{% endif %}
+      <div class="card-meta">
+        {% if profile.location %}<span class="badge"><i class="fa-solid fa-location-dot"></i> {{ profile.location }}</span>{% endif %}
+        {% if profile.website %}<a class="badge" href="{{ profile.website }}" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i> الموقع</a>{% endif %}
+        <span class="badge"><i class="fa-solid fa-feather-pointed"></i> {{ posts|length }} منشور</span>
+      </div>
+    </div>
+    {% if is_own_profile %}
+      <div class="actions">
+        <a class="button ghost" href="{% url 'profile_edit' %}"><i class="fa-solid fa-pen"></i> تعديل</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if is_own_profile %}
+<section class="section detail-panel">
+  <div class="section-title">
+    <h2>اكتب منشورًا جديدًا</h2>
+    <span class="muted">شارك فكرة أو ملاحظة أو أغنية من مكتبة نغم مع جمهورك.</span>
+  </div>
+  <form class="post-form" action="{% url 'create_post' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="{{ post_form.body.id_for_label }}">النص</label>
+    {{ post_form.body }}
+    <label for="{{ post_form.shared_track.id_for_label }}">الأغنية المرتبطة</label>
+    {{ post_form.shared_track }}
+    <label for="{{ post_form.image.id_for_label }}">الصورة</label>
+    {{ post_form.image }}
+    <button class="button primary" type="submit"><i class="fa-solid fa-paper-plane"></i> نشر المنشور</button>
+  </form>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="section-title">
+    <h2>المنشورات</h2>
+    <span class="muted">{{ posts|length }} منشور</span>
+  </div>
+  <div class="posts-grid">
+    {% for post in posts %}
+      {% include "partials/post_card.html" %}
+    {% empty %}
+      <div class="empty">لا توجد منشورات بعد.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

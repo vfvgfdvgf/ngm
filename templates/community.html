@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load nagham_tags %}
+
+{% block content %}
+<section class="hero hero-premium community-hero">
+  <div class="hero-copy glass-panel">
+    <div class="eyebrow">مجتمع نغم</div>
+    <h1>شارك ذوقك، اكتشف ناس يشبهونك، وخذ أفكار جديدة للسماع.</h1>
+    <p>هنا يلتقي محبين الصوت الصافي بدون موسيقى، من مشاركات بسيطة إلى قوائم مرتبة ومقاطع تستاهل تنسمع.</p>
+    <div class="actions hero-actions">
+      <a class="button primary" href="{% if user.is_authenticated %}{% url 'profile_detail_self' %}{% else %}{% url 'signup' %}{% endif %}">
+        <i class="fa-solid fa-user"></i>
+        {% if user.is_authenticated %}روح لملفك{% else %}سو حسابك{% endif %}
+      </a>
+      <a class="button ghost" href="{% url 'playlists' %}"><i class="fa-solid fa-list"></i> شوف القوائم</a>
+    </div>
+  </div>
+
+  <div class="hero-panel glass-panel">
+    <div class="eyebrow">نبض المجتمع</div>
+    <h2>أرقام تعكس الحركة</h2>
+    <div class="dashboard-grid dashboard-grid-compact">
+      <div class="dashboard-card">
+        <span>المستمعون</span>
+        <strong>{{ community_stats.listeners }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>المنشورات</span>
+        <strong>{{ community_stats.posts }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>قوائم التشغيل</span>
+        <strong>{{ community_stats.playlists }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>التعليقات</span>
+        <strong>{{ community_stats.comments }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% render_banner_slot "after_hero" %}
+
+{% if trending_categories %}
+<section class="section">
+  <div class="pill-row">
+    {% for category in trending_categories %}
+      <a class="pill-link" href="{% url 'category_detail' category.id %}">
+        <span>{{ category.name }}</span>
+        <strong>{{ category.track_count }}</strong>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_1" %}
+
+{% if recommended_posts %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">مقترح لك</div>
+      <h2>منشورات عليها تفاعل</h2>
+    </div>
+    <span class="muted">تعرف على اهتمامات الناس في المجتمع بشكل أسرع.</span>
+  </div>
+  <div class="posts-grid posts-grid-featured">
+    {% for post in recommended_posts %}
+      {% include "partials/post_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_2" %}
+
+{% if posts %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">آخر المشاركات</div>
+      <h2>وش الجديد اليوم؟</h2>
+    </div>
+  </div>
+  <div class="posts-grid">
+    {% for post in posts %}
+      {% include "partials/post_card.html" %}
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=posts_page %}
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_3" %}
+
+{% if community_playlists %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">قوائم المجتمع</div>
+      <h2>قوائم من الناس وللناس على حسب الاستخدام</h2>
+    </div>
+    <a class="button ghost" href="{% url 'playlists' %}">كل القوائم</a>
+  </div>
+  <div class="grid">
+    {% for playlist in community_playlists %}
+      <a class="card playlist-card" href="{% url 'playlist_detail' playlist.id %}">
+        <div class="art">
+          {% if playlist.cover %}
+            <img src="{{ playlist.cover.url }}" alt="{{ playlist.name }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-list-ul" label="قائمة تشغيل" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ playlist.name }}</h3>
+        <p class="muted">{{ playlist.user.username }} • {{ playlist.tracks_count }} مقطع</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% render_banner_slot "bottom" %}
+{% endblock %}

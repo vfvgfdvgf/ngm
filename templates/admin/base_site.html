@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}لوحة تحكم نغم{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/admin-liquid.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <div class="admin-branding">
+    <div class="admin-brand-mark">ن</div>
+    <div class="admin-brand-copy">
+      <h1 id="site-name"><a href="{% url 'admin:index' %}">لوحة تحكم نغم</a></h1>
+      <p>إدارة المحتوى والمجتمع والحماية من مساحة عربية أوضح</p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

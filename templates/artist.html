@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  "name": "{{ artist.name|escapejs }}",
+  "url": "{{ site_base_url }}{{ request.path }}"{% if artist.image %},
+  "image": "{{ site_base_url }}{{ artist.image.url }}"{% endif %}{% if artist.bio %},
+  "description": "{{ artist.bio|escapejs }}"{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="detail-grid">
+  <div class="detail-art glass-panel">
+    {% if artist.image %}
+      <img src="{{ artist.image.url }}" alt="{{ artist.name }}" decoding="async" fetchpriority="high">
+    {% else %}
+      {% include "partials/media_placeholder.html" with icon="fa-user-voice" label="صورة الفنان" %}
+    {% endif %}
+  </div>
+
+  <div class="detail-panel">
+    <div class="eyebrow">ملف الفنان</div>
+    <h1>{{ artist.name }} {% if artist.verified %}<i class="fa-solid fa-circle-check" style="color: var(--success)"></i>{% endif %}</h1>
+    <div class="card-meta">
+      <span class="badge"><i class="fa-solid fa-wave-square"></i> {{ artist.track_count }} مقطع</span>
+      <span class="badge"><i class="fa-solid fa-user-group"></i> {{ artist.followers_count }} متابع</span>
+    </div>
+    {% if artist.bio %}<p>{{ artist.bio }}</p>{% endif %}
+    {% if artist_categories %}
+      <div class="pill-row">
+        {% for category in artist_categories %}
+          <a class="pill-link" href="{% url 'category_detail' category.id %}">
+            <span>{{ category.name }}</span>
+            <strong>{{ category.track_count }}</strong>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if user.is_authenticated %}
+      <form action="{% url 'follow_artist' artist.id %}" method="post">{% csrf_token %}
+        <button class="button {% if is_following_artist %}ghost is-active{% else %}primary{% endif %}" type="submit"><i class="fa-solid fa-user-plus"></i> {% if is_following_artist %}إلغاء المتابعة{% else %}متابعة{% endif %}</button>
+      </form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+      <div>
+      <div class="eyebrow">الأكثر حضورًا</div>
+      <h2>المقاطع</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for track in tracks %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">لا توجد مقاطع لهذا الفنان بعد.</div>
+    {% endfor %}
+  </div>
+  {% if tracks_page and tracks_page.has_other_pages %}
+    <nav class="pagination" aria-label="مقاطع الفنان">
+      {% if tracks_page.has_previous %}
+        <a class="button ghost" href="?tracks_page={{ tracks_page.previous_page_number }}{% if albums_page.number %}&albums_page={{ albums_page.number }}{% endif %}">السابق</a>
+      {% endif %}
+      <span class="muted">صفحة {{ tracks_page.number }} من {{ tracks_page.paginator.num_pages }}</span>
+      {% if tracks_page.has_next %}
+        <a class="button ghost" href="?tracks_page={{ tracks_page.next_page_number }}{% if albums_page.number %}&albums_page={{ albums_page.number }}{% endif %}">التالي</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-title">
+      <div>
+      <div class="eyebrow">الإصدارات</div>
+      <h2>الألبومات</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for album in albums %}
+      <a class="card" href="{% url 'album_detail' album.id %}">
+        <div class="art">
+          {% if album.cover %}
+            <img src="{{ album.cover.url }}" alt="{{ album.title }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-compact-disc" label="غلاف الألبوم" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ album.title }}</h3>
+        <p class="muted">{{ album.tracks_count }} مقطع</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا توجد ألبومات بعد.</div>
+    {% endfor %}
+  </div>
+  {% if albums_page and albums_page.has_other_pages %}
+    <nav class="pagination" aria-label="ألبومات الفنان">
+      {% if albums_page.has_previous %}
+        <a class="button ghost" href="?albums_page={{ albums_page.previous_page_number }}{% if tracks_page.number %}&tracks_page={{ tracks_page.number }}{% endif %}">السابق</a>
+      {% endif %}
+      <span class="muted">صفحة {{ albums_page.number }} من {{ albums_page.paginator.num_pages }}</span>
+      {% if albums_page.has_next %}
+        <a class="button ghost" href="?albums_page={{ albums_page.next_page_number }}{% if tracks_page.number %}&tracks_page={{ tracks_page.number }}{% endif %}">التالي</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+
+{% if related_artists %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">قد يعجبك أيضًا</div>
+      <h2>فنانون قريبون من ذوقك</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for related_artist in related_artists %}
+      <a class="card" href="{% url 'artist_detail' related_artist.id %}">
+        <div class="art">
+          {% if related_artist.image %}
+            <img src="{{ related_artist.image.url }}" alt="{{ related_artist.name }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-user-voice" label="صورة الفنان" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ related_artist.name }}</h3>
+        <p class="muted">{{ related_artist.track_count }} مقطع • {{ related_artist.followers_count }} متابع</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

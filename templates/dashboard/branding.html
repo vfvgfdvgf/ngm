@@ -1,0 +1,72 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}هوية المنصة{% endblock %}
+{% block dashboard_intro %}من هنا تقدر تعدل اسم الموقع، الشعار النصي، شعار المنصة، وfavicon مباشرة من لوحة التحكم بدون الحاجة إلى Django Admin.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">التخصيص</span>
+          <h2>إعدادات الشعار و favicon</h2>
+        </div>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="dashboard-form-grid two">
+        {% csrf_token %}
+        {% for field in branding_form %}
+          <label class="dashboard-form-field {% if field.name == 'logo' or field.name == 'favicon' %}is-full{% endif %}">
+            <span>{{ field.label }}</span>
+            {{ field }}
+            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+            {% for error in field.errors %}<small class="form-error">{{ error }}</small>{% endfor %}
+          </label>
+        {% endfor %}
+        {% for error in branding_form.non_field_errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        <div class="dashboard-actions-row">
+          <button class="dashboard-button primary" type="submit">حفظ الهوية</button>
+          <a class="dashboard-button" href="{% url 'staff_dashboard_settings' %}">العودة للإعدادات</a>
+        </div>
+      </form>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div>
+          <span class="dashboard-kicker">المعاينة</span>
+          <h2>كيف ستظهر المنصة</h2>
+        </div>
+      </div>
+
+      <div class="dashboard-media-grid">
+        <div class="dashboard-media-card">
+          <span>الشعار الحالي</span>
+          {% if branding_settings.logo %}
+            <img src="{{ branding_settings.logo.url }}" alt="{{ branding_settings.site_name }}">
+          {% else %}
+            <strong>{{ branding_settings.site_name|slice:":1" }}</strong>
+          {% endif %}
+        </div>
+
+        <div class="dashboard-media-card favicon">
+          <span>favicon الحالي</span>
+          {% if branding_settings.favicon %}
+            <img src="{{ branding_settings.favicon.url }}" alt="Favicon">
+          {% elif branding_settings.logo %}
+            <img src="{{ branding_settings.logo.url }}" alt="{{ branding_settings.site_name }}">
+          {% else %}
+            <strong>{{ branding_settings.site_name|slice:":1" }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="dashboard-insight-list">
+        <div class="dashboard-insight-row"><span>اسم الموقع</span><strong>{{ branding_settings.site_name }}</strong></div>
+        <div class="dashboard-insight-row"><span>الشعار النصي</span><strong>{{ branding_settings.tagline }}</strong></div>
+        <div class="dashboard-insight-row"><span>زر الهيدر</span><strong>{{ branding_settings.header_cta_label }}</strong></div>
+        <div class="dashboard-insight-row"><span>رابط الزر</span><strong class="mono">{{ branding_settings.header_cta_url }}</strong></div>
+      </div>
+    </article>
+  </section>
+{% endblock %}

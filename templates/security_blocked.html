@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="detail-panel security-block-panel">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">وصول مقيّد</div>
+      <h1>تم رصد نشاط غير اعتيادي</h1>
+    </div>
+  </div>
+  <p>تم تقييد هذا الاتصال مؤقتًا بعد رصد محاولة فحص أو عبث غير اعتيادي على المنصة.</p>
+  <div class="card-meta">
+    <span class="badge"><i class="fa-solid fa-shield-halved"></i> {{ block_reason }}</span>
+    <span class="badge"><i class="fa-solid fa-clock"></i> الحظر مؤقت ويُراجع تلقائيًا</span>
+  </div>
+  <p class="muted">إذا كان هذا القيد قد فُعّل بالخطأ أثناء تصفح طبيعي، انتظر قليلًا ثم أعد المحاولة من جديد.</p>
+</section>
+{% endblock %}

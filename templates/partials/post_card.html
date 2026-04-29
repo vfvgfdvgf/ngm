@@ -1,0 +1,96 @@
+<article class="post-card">
+  <div class="post-card-head">
+    <a class="post-author" href="{% url 'profile_detail' post.user.username %}">
+      <span class="post-author-art">
+        {% if post.user.profile.avatar %}
+          <img src="{{ post.user.profile.avatar.url }}" alt="{{ post.user.username }}" loading="lazy" decoding="async">
+        {% else %}
+          {% include "partials/media_placeholder.html" with icon="fa-user" label="الصورة الشخصية" extra_class="mini" %}
+        {% endif %}
+      </span>
+      <span class="post-author-meta">
+        <strong>{{ post.user.profile.name|default:post.user.username }}</strong>
+        <span class="muted">@{{ post.user.username }} • {{ post.created_at|date:"Y-m-d H:i" }}</span>
+      </span>
+    </a>
+    <a class="button ghost compact" href="{% url 'profile_detail' post.user.username %}">الملف</a>
+  </div>
+
+  {% if post.body %}
+    <p class="post-body">{{ post.body|linebreaksbr }}</p>
+  {% endif %}
+
+  {% if post.shared_track %}
+    <a class="shared-track-preview" href="{% url 'track_detail' post.shared_track.id %}">
+      <span class="shared-track-art">
+        {% if post.shared_track.cover %}
+          <img src="{{ post.shared_track.cover.url }}" alt="{{ post.shared_track.title }}" loading="lazy" decoding="async">
+        {% else %}
+          {% include "partials/media_placeholder.html" with icon="fa-music" label="غلاف المقطع" extra_class="compact" %}
+        {% endif %}
+      </span>
+      <span class="shared-track-copy">
+        <span class="shared-track-kicker">أغنية مضافة إلى المنشور</span>
+        <strong>{{ post.shared_track.title }}</strong>
+        <span class="muted">{{ post.shared_track.artist.name }}{% if post.shared_track.album %} • {{ post.shared_track.album.title }}{% endif %}</span>
+      </span>
+      <span class="shared-track-action" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+    </a>
+  {% endif %}
+
+  {% if post.image %}
+    <div class="post-image">
+      <img src="{{ post.image.url }}" alt="صورة منشور {{ post.user.username }}" loading="lazy" decoding="async">
+    </div>
+  {% endif %}
+
+  <div class="post-actions-row">
+    <div class="post-stats">
+      <span class="badge"><i class="fa-regular fa-heart"></i> {{ post.likes_count|default:0 }}</span>
+      <span class="badge"><i class="fa-regular fa-comment"></i> {{ post.comments_count|default:0 }}</span>
+      <span class="badge"><i class="fa-regular fa-clock"></i> {{ post.created_at|timesince }}</span>
+    </div>
+    {% if user.is_authenticated %}
+      <form action="{% url 'like_post' post.id %}" method="post" class="inline-form">
+        {% csrf_token %}
+        <button class="button compact {% if post.viewer_has_liked %}primary{% else %}ghost{% endif %}" type="submit" aria-label="إعجاب بالمنشور">
+          <i class="{% if post.viewer_has_liked %}fa-solid{% else %}fa-regular{% endif %} fa-heart"></i>
+          {% if post.viewer_has_liked %}معجب{% else %}أعجبني{% endif %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="post-comments">
+    {% if user.is_authenticated %}
+      <form class="post-comment-form" action="{% url 'add_post_comment' post.id %}" method="post">
+        {% csrf_token %}
+        <label class="sr-only" for="post-comment-{{ post.id }}">أضف تعليقًا</label>
+        <textarea id="post-comment-{{ post.id }}" name="body" rows="2" maxlength="600" placeholder="اكتب تعليقك على هذا المنشور"></textarea>
+        <button class="button primary compact" type="submit">
+          <i class="fa-solid fa-paper-plane"></i>
+          تعليق
+        </button>
+      </form>
+    {% endif %}
+
+    {% with visible_comments=post.visible_comments|default:post.comments.all %}
+      {% if visible_comments %}
+        <div class="post-comment-list">
+          {% for comment in visible_comments|slice:":3" %}
+            <div class="post-comment-item" id="post-comment-{{ comment.id }}">
+              <div class="comment-head">
+                <strong>{{ comment.user.profile.name|default:comment.user.username }}</strong>
+                <a class="comment-link" href="{% url 'post_comment_detail' comment.id %}">رابط التعليق</a>
+              </div>
+              <p>{{ comment.body|linebreaksbr }}</p>
+              <span class="muted">{{ comment.created_at|timesince }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% elif user.is_authenticated %}
+        <p class="muted post-comment-empty">ابدأ أول تعليق على هذا المنشور.</p>
+      {% endif %}
+    {% endwith %}
+  </div>
+</article>

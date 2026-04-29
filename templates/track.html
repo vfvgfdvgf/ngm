@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicRecording",
+  "name": "{{ track.title|escapejs }}",
+  "url": "{{ site_base_url }}{{ request.path }}",
+  "byArtist": {
+    "@type": "MusicGroup",
+    "name": "{{ track.artist.name|escapejs }}"
+  }{% if track.cover %},
+  "image": "{{ site_base_url }}{{ track.cover.url }}"{% endif %}{% if track.description %},
+  "description": "{{ track.description|escapejs }}"{% endif %},
+  "interactionStatistic": {
+    "@type": "InteractionCounter",
+    "interactionType": "https://schema.org/ListenAction",
+    "userInteractionCount": {{ track.views|default:0 }}
+  }
+}
+</script>
+{% endblock %}
+{% block player_art %}{% if track.cover %}<img src="{{ track.cover.url }}" alt="{{ track.title }}" decoding="async">{% else %}{% include "partials/media_placeholder.html" with icon="fa-microphone-lines" label="" extra_class="mini" %}{% endif %}{% endblock %}
+{% block player_kicker %}يعمل الآن{% endblock %}
+{% block player_title %}{{ track.title }}{% endblock %}
+{% block player_artist %}{{ track.artist.name }}{% endblock %}
+{% block player_audio %}src="{{ track.audio_file.url }}"{% endblock %}
+
+{% block content %}
+<section class="detail-grid">
+  <div class="detail-art glass-panel">
+    {% if track.cover %}
+      <img src="{{ track.cover.url }}" alt="{{ track.title }}" decoding="async" fetchpriority="high">
+    {% else %}
+      {% include "partials/media_placeholder.html" with icon="fa-microphone-lines" label="غلاف المقطع" %}
+    {% endif %}
+  </div>
+
+  <div class="detail-panel">
+    <div class="eyebrow">يعمل الآن</div>
+    <h1>{{ track.title }}</h1>
+    <p class="muted">
+      <a href="{% url 'artist_detail' track.artist.id %}">{{ track.artist.name }}</a>
+      {% if track.album %}• <a href="{% url 'album_detail' track.album.id %}">{{ track.album.title }}</a>{% endif %}
+      {% if track.category %}• <a href="{% url 'category_detail' track.category.id %}">{{ track.category.name }}</a>{% endif %}
+    </p>
+
+    <div class="card-meta">
+      <span class="badge"><i class="fa-regular fa-eye"></i> {{ track.views }} استماع</span>
+      <span class="badge"><i class="fa-solid fa-heart"></i> {{ track.likes_count|default:0 }} إعجاب</span>
+      <span class="badge"><i class="fa-regular fa-clock"></i> {{ track.duration_label }}</span>
+      {% if track.get_mood_display %}<span class="badge">{{ track.get_mood_display }}</span>{% endif %}
+    </div>
+
+    {% if track.description %}
+      <p>{{ track.description }}</p>
+    {% endif %}
+
+    <div class="actions">
+      <button
+        class="button primary"
+        type="button"
+        data-player-track
+        data-autoplay="true"
+        data-track-id="{{ track.id }}"
+        data-track-title="{{ track.title }}"
+        data-track-artist="{{ track.artist.name }}"
+        data-track-src="{{ track.audio_file.url }}"
+        data-track-art="{% if track.cover %}{{ track.cover.url }}{% endif %}"
+        aria-label="تشغيل {{ track.title }}"
+      >
+        <i class="fa-solid fa-play"></i> تشغيل الآن
+      </button>
+      <form action="{% url 'like_track' track.id %}" method="post">{% csrf_token %}
+        <button class="button ghost {% if user.is_authenticated and user in track.likes.all %}is-active{% endif %}" type="submit"><i class="fa-solid fa-heart"></i> {% if user.is_authenticated and user in track.likes.all %}إزالة الإعجاب{% else %}إعجاب{% endif %}</button>
+      </form>
+      {% if user.is_authenticated %}
+        <form action="{% url 'save_track' track.id %}" method="post">{% csrf_token %}
+          <button class="button ghost {% if user in track.saved_by.all %}is-active{% endif %}" type="submit"><i class="fa-solid fa-bookmark"></i> {% if user in track.saved_by.all %}محفوظ{% else %}حفظ{% endif %}</button>
+        </form>
+        <form action="{% url 'add_to_queue' track.id %}" method="post">{% csrf_token %}
+          <button class="button ghost" type="submit"><i class="fa-solid fa-list-ol"></i> إلى الطابور</button>
+        </form>
+        {% if user_playlists %}
+          <form class="form-row" action="{% url 'add_to_playlist' track.id %}" method="post">
+            {% csrf_token %}
+            <select name="playlist" required>
+              {% for playlist in user_playlists %}
+                <option value="{{ playlist.id }}">{{ playlist.name }}</option>
+              {% endfor %}
+            </select>
+            <button class="button ghost" type="submit"><i class="fa-solid fa-plus"></i> أضف لقائمة</button>
+          </form>
+        {% endif %}
+      {% endif %}
+      {% if track.allow_download %}
+        <a class="button ghost" href="{{ track.audio_file.url }}" download><i class="fa-solid fa-download"></i> تحميل</a>
+      {% endif %}
+      <button
+        class="button ghost"
+        type="button"
+        data-share-url="{% url 'track_detail' track.id %}"
+        data-share-title="{{ track.title }} - {{ track.artist.name }}"
+        data-share-track-id="{{ track.id }}"
+        aria-label="مشاركة {{ track.title }}"
+      >
+        <i class="fa-solid fa-arrow-up-from-bracket"></i> مشاركة
+      </button>
+    </div>
+  </div>
+</section>
+
+{% if track.lyrics %}
+<section class="detail-panel">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">الكلمات</div>
+      <h2>الكلمات</h2>
+    </div>
+  </div>
+  <p style="white-space: pre-line">{{ track.lyrics }}</p>
+</section>
+{% endif %}
+
+<section class="detail-panel">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">النقاش</div>
+      <h2>التعليقات</h2>
+    </div>
+    <span class="muted">{{ comments|length }} تعليق</span>
+  </div>
+  {% if user.is_authenticated %}
+    <form class="comment-form" action="{% url 'add_comment' track.id %}" method="post">
+      {% csrf_token %}
+      <textarea name="body" rows="3" maxlength="600" placeholder="شارك رأيك حول هذا المقطع" required></textarea>
+      <button class="button primary" type="submit"><i class="fa-solid fa-paper-plane"></i> إرسال</button>
+    </form>
+  {% else %}
+    <div class="empty">سجل الدخول لإضافة تعليق ومشاركة انطباعك حول هذا المقطع.</div>
+  {% endif %}
+  <div class="comments-list">
+    {% for comment in comments %}
+      <article class="comment" id="track-comment-{{ comment.id }}">
+        <div class="comment-head">
+          <strong>{{ comment.user.profile.name|default:comment.user.username }}</strong>
+          <div class="comment-meta-row">
+            <span class="muted">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+            <a class="comment-link" href="{% url 'track_comment_detail' comment.id %}">رابط التعليق</a>
+          </div>
+        </div>
+        <p>{{ comment.body }}</p>
+      </article>
+    {% empty %}
+      <div class="empty">لا توجد تعليقات بعد.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">مقاطع مشابهة</div>
+      <h2>قد يعجبك أيضًا</h2>
+    </div>
+    <a class="button ghost" href="{% url 'discover' %}">اكتشف المزيد</a>
+  </div>
+  <div class="grid">
+    {% for track in suggested_tracks %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">لا توجد اقتراحات مشابهة حاليًا.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

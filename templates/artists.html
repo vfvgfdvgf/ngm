@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}الفنانون • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <h1>الفنانون</h1>
+    <a class="button" href="{% url 'albums' %}">الألبومات</a>
+  </div>
+  <div class="grid">
+    {% for artist in artists %}
+      <a class="card" href="{% url 'artist_detail' artist.id %}">
+        <div class="art">
+          {% if artist.image %}
+            <img src="{{ artist.image.url }}" alt="{{ artist.name }}">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-user-voice" label="صورة الفنان" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ artist.name }} {% if artist.verified %}<i class="fa-solid fa-circle-check" style="color: var(--brand)"></i>{% endif %}</h3>
+        <p class="muted">{{ artist.track_count }} مقطع • {{ artist.followers_count }} متابع</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا يوجد فنانون بعد.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=artists_page %}
+</section>
+{% endblock %}

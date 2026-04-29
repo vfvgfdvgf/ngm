@@ -1,0 +1,110 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}الزوار والتحليلات{% endblock %}
+{% block dashboard_intro %}عرض أعمق لحركة الزيارات، الدول، المسارات، الإحالات، وسرعة الاستجابة حتى تكون القراءة التشغيلية أوضح للإدارة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الدول</span><h2>أكثر الدول زيارة</h2></div>
+      </div>
+      <div class="dashboard-list">
+        {% for row in dashboard.top_countries %}
+          <div class="dashboard-list-row"><strong>{{ row.country_code }}</strong><span>{{ row.total }} زيارة</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات دول متاحة حاليًا.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الشبكة</span><h2>أكثر IP زيارة</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in dashboard.top_ips %}
+          <div class="dashboard-list-row"><strong>{{ row.ip_address }}</strong><span>{{ row.total }} زيارة</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات كافية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الإحالات</span><h2>مصادر الوصول</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in dashboard.top_referrers %}
+          <div class="dashboard-list-row"><strong>{{ row.referer }}</strong><span>{{ row.total }} زيارة</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد إحالات خارجية مسجلة.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المسارات</span><h2>أكثر الصفحات زيارة</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in dashboard.top_pages %}
+          <div class="dashboard-list-row"><strong>{{ row.path }}</strong><span>{{ row.total }} • {{ row.avg_ms|floatformat:0 }}ms</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات صفحات كافية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الأداء</span><h2>أبطأ الصفحات</h2></div>
+      </div>
+      <div class="dashboard-list mono">
+        {% for row in dashboard.slow_pages %}
+          <div class="dashboard-list-row"><strong>{{ row.path }}</strong><span>{{ row.avg_ms|floatformat:0 }}ms</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لم تُرصَد صفحات بطيئة بما يكفي بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الاستجابات</span><h2>أكواد الحالة</h2></div>
+      </div>
+      <div class="dashboard-list">
+        {% for row in dashboard.status_codes %}
+          <div class="dashboard-list-row"><strong>{{ row.status_code }}</strong><span>{{ row.total }} طلب</span></div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات حالة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-tertiary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المباشر</span><h2>آخر الزيارات المسجلة</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for visit in dashboard.recent_visits %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong class="mono">{{ visit.path }}</strong>
+              <p class="muted mono">{{ visit.ip_address }}{% if visit.country_code %} • {{ visit.country_code }}{% endif %}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ visit.response_ms }}ms</span>
+              <small>{{ visit.visited_at|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد زيارات مسجلة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

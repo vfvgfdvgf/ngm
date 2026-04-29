@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load nagham_tags %}
+
+{% block content %}
+<section class="hero hero-premium">
+  <div class="hero-copy glass-panel">
+    <div class="eyebrow">نغَم</div>
+    <h1>نغَم منصة تقدّم لك الأغاني بصوت صافي 100% بدون موسيقى</h1>
+    <p>استمتع بصوت المغني الحقيقي (Acapella) بجودة عالية، سواء تسمع للمتعة أو تستخدمها في المونتاج وصناعة المحتوى. كل شيء جاهز، سريع، وبضغطة زر.</p>
+
+    <div class="actions hero-actions">
+      <a class="button primary" href="{% url 'discover' %}"><i class="fa-solid fa-play"></i> ابدأ السماع</a>
+      <a class="button ghost" href="{% url 'community' %}"><i class="fa-solid fa-users"></i> شوف المجتمع</a>
+      <a class="button ghost" href="{% url 'charts' %}"><i class="fa-solid fa-chart-line"></i> الأكثر استماعًا</a>
+      {% if not user.is_authenticated %}
+        <a class="button ghost" href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> سو حسابك</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="hero-panel glass-panel">
+    <div class="eyebrow">أرقام سريعة</div>
+    <h2>لمحة سريعة عن المنصة</h2>
+    <div class="dashboard-grid dashboard-grid-compact">
+      <div class="dashboard-card">
+        <span>المقاطع الجاهزة</span>
+        <strong>{{ community_stats.tracks }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>الفنانون</span>
+        <strong>{{ community_stats.artists }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>قوائم التشغيل</span>
+        <strong>{{ community_stats.playlists }}</strong>
+      </div>
+      <div class="dashboard-card">
+        <span>أعضاء المجتمع</span>
+        <strong>{{ community_stats.members }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% render_banner_slot "after_hero" %}
+
+{% if continue_listening %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">كمل سماعك</div>
+      <h2>ارجع من المكان اللي وقفت عنده</h2>
+    </div>
+    <a class="button ghost" href="{% url 'library' %}">روح لمكتبتي</a>
+  </div>
+  <div class="grid">
+    {% for track in continue_listening %}
+      {% include "partials/track_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_1" %}
+
+{% if featured_tracks %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">مختارات نغم</div>
+      <h2>مقاطع مختارة تسمعها وأنت مرتاح</h2>
+    </div>
+    <a class="button ghost" href="{% url 'discover' %}">اكتشف أكثر</a>
+  </div>
+  <div class="grid">
+    {% for track in featured_tracks %}
+      {% include "partials/track_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_2" %}
+
+{% if mood_spotlights %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">على حسب مزاجك</div>
+      <h2>ادخل على جوك واختر اللي يناسبك</h2>
+    </div>
+    <a class="button ghost" href="{% url 'search' %}">عرض البحث</a>
+  </div>
+  <div class="spotlight-grid">
+    {% for mood in mood_spotlights %}
+      <a class="spotlight-card glass-panel" href="{% url 'search' %}?mood={{ mood.slug }}">
+        <div class="spotlight-head">
+          <span class="eyebrow">{{ mood.label }}</span>
+          <span class="spotlight-count">{{ mood.count }} مقطع</span>
+        </div>
+        <div class="spotlight-art">
+          {% if mood.lead.cover %}
+            <img src="{{ mood.lead.cover.url }}" alt="{{ mood.lead.title }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-wave-square" label="صوت" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <strong>{{ mood.lead.title }}</strong>
+        <p class="muted">{{ mood.lead.artist.name }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "after_section_3" %}
+
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">جاهز الآن</div>
+      <h2>أحدث المقاطع الجاهزة لك الآن</h2>
+    </div>
+    <a class="button ghost" href="{% url 'search' %}">افتح البحث</a>
+  </div>
+  <div class="grid">
+    {% for track in tracks %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">ما فيه مقاطع ظاهرة حاليًا.</div>
+    {% endfor %}
+  </div>
+</section>
+
+{% if playlists %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">قوائم جاهزة</div>
+      <h2>قوائم مرتبة حسب جوك واستخدامك اليومي</h2>
+    </div>
+    <a class="button ghost" href="{% url 'playlists' %}">كل القوائم</a>
+  </div>
+  <div class="grid">
+    {% for playlist in playlists %}
+      <a class="card playlist-card" href="{% url 'playlist_detail' playlist.id %}">
+        <div class="art">
+          {% if playlist.cover %}
+            <img src="{{ playlist.cover.url }}" alt="{{ playlist.name }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-list-ul" label="قائمة تشغيل" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ playlist.name }}</h3>
+        <p class="muted">{{ playlist.user.username }} • {{ playlist.tracks_count }} مقطع</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if recent_posts %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">من المجتمع</div>
+      <h2>شوف وش الناس تتكلم عنه اليوم</h2>
+    </div>
+    <a class="button ghost" href="{% url 'community' %}">ادخل المجتمع</a>
+  </div>
+  <div class="posts-grid">
+    {% for post in recent_posts %}
+      {% include "partials/post_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% render_banner_slot "bottom" %}
+{% endblock %}

@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} | {{ site_settings.site_name }}</title>
+  <meta name="robots" content="noindex,nofollow">
+  {% if site_settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}">
+    <link rel="shortcut icon" href="{{ site_settings.favicon.url }}">
+  {% elif site_settings.logo %}
+    <link rel="icon" type="image/png" href="{{ site_settings.logo.url }}">
+  {% endif %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/dashboard-admin.css' %}">
+</head>
+<body class="dashboard-admin-body">
+  <div class="dashboard-admin-shell">
+    <aside class="dashboard-admin-sidebar">
+      <div class="dashboard-admin-brand">
+        <span class="dashboard-admin-brand-mark">
+          {% if site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}">
+          {% else %}
+            <span class="dashboard-admin-brand-initial">{{ site_settings.site_name|slice:":1" }}</span>
+          {% endif %}
+        </span>
+        <div>
+          <strong>{{ site_settings.site_name }}</strong>
+          <span>لوحة الإدارة الداخلية</span>
+        </div>
+      </div>
+
+      <div class="dashboard-admin-sidecard dashboard-admin-sidecard-hero">
+        <span class="dashboard-admin-sidekicker">مساحة الإدارة</span>
+        <strong>تحكم أسرع وقراءة أوضح لحالة المنصة</strong>
+        <p>تنقل بين الأداء والمحتوى والحماية وSEO من واجهة واحدة أكثر ترتيبًا ووضوحًا.</p>
+      </div>
+
+      <nav class="dashboard-admin-nav" aria-label="تنقل الإدارة">
+        {% for item in dashboard_sections %}
+          <a href="{{ item.url }}" class="dashboard-admin-nav-link {% if item.active %}is-active{% endif %}">
+            <i class="fa-solid {{ item.icon }}"></i>
+            <span class="dashboard-admin-nav-copy">{{ item.label }}</span>
+          </a>
+        {% endfor %}
+      </nav>
+
+      <div class="dashboard-admin-sidecard">
+        <strong>روابط التشغيل</strong>
+        <div class="dashboard-admin-shortcuts">
+          {% for item in manage_links %}
+            <a href="{{ item.url }}"><i class="fa-solid {{ item.icon|default:'fa-link' }}"></i> {{ item.label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="dashboard-admin-sidecard">
+        <strong>ملخص سريع</strong>
+        <div class="dashboard-admin-microstats">
+          <div><span>اليوم</span><strong>{{ dashboard.overview.visits_today }}</strong></div>
+          <div><span>الاستجابة</span><strong>{{ dashboard.overview.avg_response_ms }}ms</strong></div>
+          <div><span>التنبيهات</span><strong>{{ dashboard.security_summary.today }}</strong></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="dashboard-admin-main">
+      <header class="dashboard-admin-topbar">
+        <div class="dashboard-admin-topbar-copy">
+          <p class="dashboard-admin-kicker">مساحة الإدارة</p>
+          <h1>{% block dashboard_title %}لوحة التحكم{% endblock %}</h1>
+          <p class="dashboard-admin-intro">{% block dashboard_intro %}{% endblock %}</p>
+          <div class="dashboard-admin-inline-meta">
+            <span><i class="fa-regular fa-circle-user"></i> {{ request.user.username }}</span>
+            <span><i class="fa-solid fa-shield-halved"></i> Staff Access</span>
+            <span><i class="fa-solid fa-bolt"></i> Live Snapshot</span>
+          </div>
+        </div>
+        <div class="dashboard-admin-topbar-actions">
+          <a href="{% url 'home' %}"><i class="fa-solid fa-globe"></i> عرض الموقع</a>
+          <a href="{% url 'admin:index' %}"><i class="fa-solid fa-table-cells-large"></i> Django Admin</a>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</button>
+          </form>
+        </div>
+      </header>
+
+      {% if messages %}
+        <section class="dashboard-flash-stack">
+          {% for message in messages %}
+            <div class="dashboard-flash">{{ message }}</div>
+          {% endfor %}
+        </section>
+      {% endif %}
+
+      <section class="dashboard-admin-summary">
+        <article class="dashboard-summary-card">
+          <span class="dashboard-summary-icon"><i class="fa-solid fa-chart-line"></i></span>
+          <span>زيارات اليوم</span>
+          <strong>{{ dashboard.overview.visits_today }}</strong>
+        </article>
+        <article class="dashboard-summary-card">
+          <span class="dashboard-summary-icon"><i class="fa-solid fa-gauge-high"></i></span>
+          <span>متوسط الاستجابة</span>
+          <strong>{{ dashboard.overview.avg_response_ms }}ms</strong>
+        </article>
+        <article class="dashboard-summary-card">
+          <span class="dashboard-summary-icon"><i class="fa-solid fa-shield-heart"></i></span>
+          <span>تنبيهات اليوم</span>
+          <strong>{{ dashboard.security_summary.today }}</strong>
+        </article>
+        <article class="dashboard-summary-card">
+          <span class="dashboard-summary-icon"><i class="fa-solid fa-users"></i></span>
+          <span>مستخدمون نشطون</span>
+          <strong>{{ dashboard.overview.signed_in_visitors }}</strong>
+        </article>
+      </section>
+
+      <section class="dashboard-admin-content">
+        {% block dashboard_body %}{% endblock %}
+      </section>
+    </main>
+  </div>
+</body>
+</html>

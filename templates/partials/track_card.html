@@ -1,0 +1,81 @@
+<article class="card track-card">
+  <a class="art" href="{% url 'track_detail' track.id %}">
+    {% if track.cover %}
+      <img src="{{ track.cover.url }}" alt="{{ track.title }}" loading="lazy" decoding="async">
+    {% else %}
+      {% include "partials/media_placeholder.html" with icon="fa-microphone-lines" label="بدون غلاف" extra_class="compact" %}
+    {% endif %}
+    <span class="badge"><i class="fa-solid fa-wave-square"></i> صوت نقي</span>
+  </a>
+
+  <div class="card-copy">
+    <div>
+      <h3><a href="{% url 'track_detail' track.id %}">{{ track.title }}</a></h3>
+      <p class="muted">
+        <a href="{% url 'artist_detail' track.artist.id %}">{{ track.artist.name }}</a>
+        {% if track.album %} • {{ track.album.title }}{% elif track.category %} • {{ track.category.name }}{% endif %}
+      </p>
+    </div>
+
+    {% if track.description %}
+      <p class="card-excerpt">{{ track.description|truncatechars:110 }}</p>
+    {% endif %}
+
+    <div class="card-meta">
+      {% if track.mood %}<span class="badge">{{ track.get_mood_display }}</span>{% endif %}
+      <span class="badge"><i class="fa-regular fa-eye"></i> {{ track.views }}</span>
+      <span class="badge"><i class="fa-regular fa-clock"></i> {{ track.duration_label }}</span>
+      <span class="badge"><i class="fa-solid fa-heart"></i> {{ track.likes_count|default:0 }}</span>
+    </div>
+
+    <div class="actions track-actions">
+      <button
+        class="button primary"
+        type="button"
+        data-player-track
+        data-track-id="{{ track.id }}"
+        data-track-title="{{ track.title }}"
+        data-track-artist="{{ track.artist.name }}"
+        data-track-src="{{ track.audio_file.url }}"
+        data-track-art="{% if track.cover %}{{ track.cover.url }}{% endif %}"
+        aria-label="تشغيل {{ track.title }}"
+      >
+        <i class="fa-solid fa-play"></i> تشغيل
+      </button>
+
+      <button
+        class="icon-button"
+        type="button"
+        data-share-url="{% url 'track_detail' track.id %}"
+        data-share-title="{{ track.title }} - {{ track.artist.name }}"
+        data-share-track-id="{{ track.id }}"
+        aria-label="مشاركة {{ track.title }}"
+        title="مشاركة"
+      >
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </button>
+
+      <form action="{% url 'like_track' track.id %}" method="post">
+        {% csrf_token %}
+        <button class="icon-button danger {% if user.is_authenticated and user in track.likes.all %}is-active{% endif %}" type="submit" aria-label="{% if user.is_authenticated and user in track.likes.all %}إزالة الإعجاب عن {{ track.title }}{% else %}إعجاب {{ track.title }}{% endif %}" title="{% if user.is_authenticated and user in track.likes.all %}إزالة الإعجاب{% else %}إعجاب{% endif %}">
+          <i class="fa-solid fa-heart"></i>
+        </button>
+      </form>
+
+      {% if user.is_authenticated %}
+        <form action="{% url 'save_track' track.id %}" method="post">
+          {% csrf_token %}
+          <button class="icon-button saved {% if user in track.saved_by.all %}is-active{% endif %}" type="submit" aria-label="{% if user in track.saved_by.all %}إزالة {{ track.title }} من المكتبة{% else %}حفظ {{ track.title }} في المكتبة{% endif %}" title="{% if user in track.saved_by.all %}محفوظ في المكتبة{% else %}حفظ في المكتبة{% endif %}">
+            <i class="fa-solid fa-bookmark"></i>
+          </button>
+        </form>
+        <form action="{% url 'add_to_queue' track.id %}" method="post">
+          {% csrf_token %}
+          <button class="icon-button" type="submit" aria-label="إضافة {{ track.title }} إلى الطابور" title="إضافة إلى الطابور">
+            <i class="fa-solid fa-list-ol"></i>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</article>

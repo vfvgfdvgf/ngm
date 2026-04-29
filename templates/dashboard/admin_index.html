@@ -1,0 +1,21 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}فهرس الإدارة الكامل{% endblock %}
+{% block dashboard_intro %}هذه الصفحة تجمع أقسام الإدارة المسجلة في Django admin داخل لوحة التحكم الجديدة، حتى يبقى كل شيء داخل مركز إدارة واحد بدل التنقل العشوائي.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-catalog-grid">
+    {% for item in admin_catalog %}
+      <article class="dashboard-catalog-card">
+        <h3>{{ item.label }}</h3>
+        <p class="dashboard-admin-intro">{{ item.app_label }} / {{ item.model_name }}</p>
+        <div class="dashboard-catalog-actions">
+          <a class="button" href="{{ item.list_url }}">عرض وإدارة</a>
+          <a class="button primary" href="{{ item.add_url }}">إضافة جديد</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="dashboard-empty">لا توجد أقسام إدارة مسجلة.</div>
+    {% endfor %}
+  </section>
+{% endblock %}

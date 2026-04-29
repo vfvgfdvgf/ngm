@@ -1,0 +1,509 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="application-name" content="{{ site_settings.site_name }}">
+  <meta name="author" content="{{ site_settings.site_name }}">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="{{ site_settings.site_name }}">
+  <title>{% if page_title %}{{ page_title }} | {{ site_settings.site_name }}{% elif global_seo.browser_title %}{{ global_seo.browser_title }}{% else %}{{ site_settings.default_title }}{% endif %}</title>
+  <meta name="description" content="{% if page_description %}{{ page_description }}{% elif global_seo.meta_description %}{{ global_seo.meta_description }}{% else %}{{ site_settings.default_description }}{% endif %}">
+  {% if page_keywords or site_settings.default_keywords %}
+    <meta name="keywords" content="{% if page_keywords %}{{ page_keywords }}{% else %}{{ site_settings.default_keywords }}{% endif %}">
+  {% endif %}
+  <meta name="color-scheme" content="light dark">
+  {% if site_settings.favicon %}
+    <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}">
+    <link rel="shortcut icon" href="{{ site_settings.favicon.url }}">
+    <link rel="apple-touch-icon" href="{{ site_settings.favicon.url }}">
+  {% elif site_settings.logo %}
+    <link rel="icon" type="image/png" href="{{ site_settings.logo.url }}">
+    <link rel="apple-touch-icon" href="{{ site_settings.logo.url }}">
+  {% endif %}
+  <link rel="manifest" href="{% url 'manifest_webmanifest' %}">
+  <link rel="alternate" hreflang="ar" href="{{ site_base_url }}{{ page_canonical|default:request.path }}">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahsans/woff2/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahsans/woff2/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahserifdisplay/woff2/thmanyahserifdisplay-Medium.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'js/desktop-ui.js' %}" as="script">
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem("nagham-theme");
+        var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.setAttribute(
+          "data-device",
+          window.matchMedia("(max-width: 960px)").matches ? "mobile" : "desktop"
+        );
+      } catch (error) {
+        document.documentElement.setAttribute("data-theme", "light");
+        document.documentElement.setAttribute("data-device", "desktop");
+      }
+    })();
+  </script>
+  {% if page_noindex or global_seo.noindex %}
+    <meta name="robots" content="noindex,nofollow">
+  {% else %}
+    <meta name="robots" content="index,follow">
+  {% endif %}
+  <link rel="canonical" href="{{ site_base_url }}{{ page_canonical|default:request.path }}">
+  <meta property="og:site_name" content="{{ site_settings.site_name }}">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ar_AR">
+  <meta property="og:locale:alternate" content="ar_SA">
+  <meta property="og:url" content="{{ site_base_url }}{{ page_canonical|default:request.path }}">
+  <meta property="og:title" content="{% if page_title %}{{ page_title }}{% elif global_seo.og_title %}{{ global_seo.og_title }}{% elif global_seo.browser_title %}{{ global_seo.browser_title }}{% else %}{{ site_settings.default_title }}{% endif %}">
+  <meta property="og:description" content="{% if page_description %}{{ page_description }}{% elif global_seo.og_description %}{{ global_seo.og_description }}{% elif global_seo.meta_description %}{{ global_seo.meta_description }}{% else %}{{ site_settings.default_description }}{% endif %}">
+  {% if page_image %}
+    <meta property="og:image" content="{{ site_base_url }}{{ page_image }}">
+    <meta property="og:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% elif global_seo.og_image %}
+    <meta property="og:image" content="{{ site_base_url }}{{ global_seo.og_image.url }}">
+    <meta property="og:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% elif site_settings.og_image %}
+    <meta property="og:image" content="{{ site_base_url }}{{ site_settings.og_image.url }}">
+    <meta property="og:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% endif %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if page_title %}{{ page_title }}{% elif global_seo.og_title %}{{ global_seo.og_title }}{% elif global_seo.browser_title %}{{ global_seo.browser_title }}{% else %}{{ site_settings.default_title }}{% endif %}">
+  <meta name="twitter:description" content="{% if page_description %}{{ page_description }}{% elif global_seo.og_description %}{{ global_seo.og_description }}{% elif global_seo.meta_description %}{{ global_seo.meta_description }}{% else %}{{ site_settings.default_description }}{% endif %}">
+  {% if page_image %}
+    <meta name="twitter:image" content="{{ site_base_url }}{{ page_image }}">
+    <meta name="twitter:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% elif global_seo.og_image %}
+    <meta name="twitter:image" content="{{ site_base_url }}{{ global_seo.og_image.url }}">
+    <meta name="twitter:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% elif site_settings.og_image %}
+    <meta name="twitter:image" content="{{ site_base_url }}{{ site_settings.og_image.url }}">
+    <meta name="twitter:image:alt" content="{% if page_title %}{{ page_title }}{% else %}{{ site_settings.site_name }}{% endif %}">
+  {% endif %}
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "{{ site_settings.site_name|escapejs }}",
+      "description": "{{ site_settings.default_description|escapejs }}",
+      "url": "{{ site_base_url }}",
+      "inLanguage": "ar",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ site_base_url }}{% url 'search' %}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "{{ site_settings.site_name|escapejs }}",
+      "url": "{{ site_base_url }}",
+      "description": "{{ site_settings.default_description|escapejs }}"
+      {% if site_settings.logo %},
+      "logo": "{{ site_base_url }}{{ site_settings.logo.url }}"
+      {% endif %}
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "{% if page_title %}{{ page_title|escapejs }}{% elif global_seo.browser_title %}{{ global_seo.browser_title|escapejs }}{% else %}{{ site_settings.default_title|escapejs }}{% endif %}",
+      "description": "{% if page_description %}{{ page_description|escapejs }}{% elif global_seo.meta_description %}{{ global_seo.meta_description|escapejs }}{% else %}{{ site_settings.default_description|escapejs }}{% endif %}",
+      "url": "{{ site_base_url }}{{ page_canonical|default:request.path }}",
+      "inLanguage": "ar",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "{{ site_settings.site_name|escapejs }}",
+        "url": "{{ site_base_url }}"
+      }
+    }
+  ]
+  </script>
+  {% block structured_data %}{% endblock %}
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" crossorigin onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/desktop.css' %}" media="screen and (min-width: 961px)">
+  {% block extra_css %}{% endblock %}
+  {% if analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ analytics_id }}');
+    </script>
+  {% endif %}
+</head>
+<body data-ui-shell data-user-authenticated="{{ user.is_authenticated|yesno:'true,false' }}" data-login-url="{% url 'login' %}" data-create-post-url="{% url 'create_post' %}">
+  <form class="sr-only" aria-hidden="true">{% csrf_token %}</form>
+  <a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
+
+  <div class="app-background" aria-hidden="true">
+    <span class="bg-orb orb-a"></span>
+    <span class="bg-orb orb-b"></span>
+    <span class="bg-orb orb-c"></span>
+    <span class="bg-grid"></span>
+  </div>
+
+  <header class="topbar liquid-surface" data-topbar>
+    <div class="topbar-inner">
+      <div class="topbar-start">
+        <button class="topbar-toggle icon-button glass" type="button" aria-expanded="false" aria-controls="app-sidebar" data-sidebar-toggle>
+          <i class="fa-solid fa-bars"></i>
+          <span class="sr-only">فتح القائمة الجانبية</span>
+        </button>
+        <a class="brand" href="{% url 'home' %}">
+          <span class="brand-mark">
+            {% if site_settings.logo %}
+              <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" decoding="async">
+            {% else %}
+              <span class="brand-initial">{{ site_settings.site_name|slice:":1" }}</span>
+            {% endif %}
+          </span>
+          <span class="brand-copy">
+            <strong>{{ site_settings.site_name }}</strong>
+            <small>{{ site_settings.tagline }}</small>
+          </span>
+        </a>
+      </div>
+
+      <a class="topbar-title" href="{% url 'home' %}">
+        <strong>{{ site_settings.site_name }}</strong>
+        <small>{{ site_settings.tagline }}</small>
+      </a>
+
+      <form class="topbar-search liquid-control" action="{% url 'search' %}" method="get" role="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <label class="sr-only" for="topbar-search-input">ابحث في نغم</label>
+        <input id="topbar-search-input" type="search" name="q" value="{{ query|default:'' }}" placeholder="ابحث عن مقطع، منشد، ألبوم أو قائمة">
+        <button class="button ghost compact" type="submit">بحث</button>
+      </form>
+
+      <div class="topbar-actions">
+        {% if user.is_authenticated %}
+          <a class="profile-chip liquid-control" href="{% url 'profile_detail_self' %}">
+            <span class="profile-chip-art">
+              {% if current_profile and current_profile.avatar %}
+                <img src="{{ current_profile.avatar.url }}" alt="{{ user.username }}" decoding="async">
+              {% else %}
+                {% include "partials/media_placeholder.html" with icon="fa-user" label="" extra_class="mini" %}
+              {% endif %}
+            </span>
+            <span>{{ current_profile.name|default:user.username }}</span>
+          </a>
+        {% else %}
+          <div class="topbar-auth">
+            <a class="button primary compact" href="{{ site_settings.header_cta_url|default:'/signup/' }}"><i class="fa-solid fa-user-plus"></i> {{ site_settings.header_cta_label }}</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <div class="sidebar-backdrop" hidden data-sidebar-backdrop></div>
+
+  <div class="app-shell">
+    <aside class="app-sidebar glass-panel liquid-surface" id="app-sidebar" data-sidebar>
+      <div class="sidebar-header">
+        <p class="sidebar-kicker">Acapella عربي</p>
+        <h2>كل اللي تحتاجه من أغاني بدون موسيقى، مرتبة وجاهزة للسماع أو للشغل.</h2>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="التنقل الرئيسي">
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}">
+          <i class="fa-solid fa-house"></i>
+          <span>الرئيسية</span>
+        </a>
+        <a href="{% url 'discover' %}" class="nav-link {% if request.resolver_match.url_name == 'discover' %}is-active{% endif %}">
+          <i class="fa-solid fa-compass"></i>
+          <span>اكتشف</span>
+        </a>
+        <a href="{% url 'community' %}" class="nav-link {% if request.resolver_match.url_name == 'community' %}is-active{% endif %}">
+          <i class="fa-solid fa-users"></i>
+          <span>المجتمع</span>
+        </a>
+        <a href="{% url 'search' %}" class="nav-link {% if request.resolver_match.url_name == 'search' %}is-active{% endif %}">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>البحث</span>
+        </a>
+        <a href="{% url 'charts' %}" class="nav-link {% if request.resolver_match.url_name == 'charts' %}is-active{% endif %}">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>الأكثر استماعًا</span>
+        </a>
+        <a href="{% url 'library' %}" class="nav-link {% if request.resolver_match.url_name == 'library' %}is-active{% endif %}">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>مكتبتي</span>
+        </a>
+        <a href="{% url 'favorites' %}" class="nav-link {% if request.resolver_match.url_name == 'favorites' %}is-active{% endif %}">
+          <i class="fa-solid fa-heart"></i>
+          <span>المفضلة</span>
+        </a>
+        <a href="{% url 'artists' %}" class="nav-link {% if request.resolver_match.url_name == 'artists' or request.resolver_match.url_name == 'artist_detail' %}is-active{% endif %}">
+          <i class="fa-solid fa-microphone-lines"></i>
+          <span>الفنانون</span>
+        </a>
+        <a href="{% url 'albums' %}" class="nav-link {% if request.resolver_match.url_name == 'albums' or request.resolver_match.url_name == 'album_detail' %}is-active{% endif %}">
+          <i class="fa-solid fa-compact-disc"></i>
+          <span>الألبومات</span>
+        </a>
+        <a href="{% url 'playlists' %}" class="nav-link {% if request.resolver_match.url_name == 'playlists' or request.resolver_match.url_name == 'playlist_detail' %}is-active{% endif %}">
+          <i class="fa-solid fa-list"></i>
+          <span>قوائم التشغيل</span>
+        </a>
+        <a href="{% url 'categories' %}" class="nav-link {% if request.resolver_match.url_name == 'categories' or request.resolver_match.url_name == 'category_detail' %}is-active{% endif %}">
+          <i class="fa-solid fa-tags"></i>
+          <span>التصنيفات</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-card glass-deep">
+        <span class="eyebrow">صوت صافي</span>
+        <strong>نغَم تجمع لك الأغاني بدون موسيقى بصوت صافي 100% وبدون تشويش.</strong>
+        <p>سواء تسمع للمتعة أو تجهز محتوى للمونتاج، كل شيء جاهز وسريع وبضغطة زر.</p>
+        <div class="actions">
+          <a class="button primary" href="{% url 'discover' %}">ابدأ السماع</a>
+          <a class="button ghost" href="{% url 'community' %}">شوف المجتمع</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="app-main-column">
+      <div class="app-main-inner">
+        {% if site_settings.maintenance_message %}
+          <div class="notice-banner glass-panel">{{ site_settings.maintenance_message }}</div>
+        {% endif %}
+
+        {% if active_announcement %}
+          <aside class="announcement glass-panel" aria-label="إعلان">
+            <div>
+              <strong>{{ active_announcement.title }}</strong>
+              <span>{{ active_announcement.message }}</span>
+            </div>
+            {% if active_announcement.link_url and active_announcement.link_label %}
+              <a class="button ghost compact" href="{{ active_announcement.link_url }}">{{ active_announcement.link_label }}</a>
+            {% endif %}
+          </aside>
+        {% endif %}
+
+        {% if messages %}
+          <div class="messages-stack">
+            {% for message in messages %}
+              <div class="message glass-panel">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% include "partials/page_banner.html" %}
+
+        <main id="main-content" class="app-main" tabindex="-1">
+          {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer glass-panel">
+          <div class="site-footer-shell">
+            <section class="footer-brand-block">
+              <div class="footer-brand-row">
+                <span class="brand-mark footer-mark">
+                  {% if site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_name }}" decoding="async">
+                  {% else %}
+                    <span class="brand-initial">{{ site_settings.site_name|slice:":1" }}</span>
+                  {% endif %}
+                </span>
+                <div>
+                  <strong>{{ site_settings.site_name }}</strong>
+                  <p class="muted">{{ site_settings.tagline }}</p>
+                </div>
+              </div>
+              <p class="footer-copy">نغَم منصة تقدّم لك الأغاني بصوت صافي 100% بدون موسيقى. استمتع بصوت المغني الحقيقي بجودة عالية، سواء للسماع أو للمونتاج وصناعة المحتوى.</p>
+              <div class="footer-actions">
+                <a class="button primary compact" href="{% url 'discover' %}"><i class="fa-solid fa-compass"></i> ابدأ السماع</a>
+                <a class="button ghost compact" href="{% url 'community' %}"><i class="fa-solid fa-users"></i> شوف المجتمع</a>
+              </div>
+              <div class="footer-utility-card liquid-control">
+                <div>
+                  <span class="eyebrow">شكل الموقع</span>
+                  <strong>بدّل بين الوضعين بسهولة</strong>
+                </div>
+                <button class="footer-theme-toggle icon-button glass" type="button" aria-label="تبديل السمة" data-theme-toggle>
+                  <i class="fa-solid fa-moon" data-theme-icon></i>
+                </button>
+              </div>
+            </section>
+
+            <section class="footer-link-group">
+              <h3>روابط سريعة</h3>
+              <nav class="footer-links" aria-label="روابط سريعة">
+                <a href="{% url 'home' %}">الرئيسية</a>
+                <a href="{% url 'discover' %}">اكتشف</a>
+                <a href="{% url 'search' %}">البحث</a>
+                <a href="{% url 'charts' %}">الأكثر استماعًا</a>
+                <a href="{% url 'community' %}">المجتمع</a>
+                <a href="{% url 'library' %}">مكتبتي</a>
+              </nav>
+            </section>
+
+            <section class="footer-link-group">
+              <h3>المحتوى</h3>
+              <nav class="footer-links" aria-label="روابط المحتوى">
+                <a href="{% url 'artists' %}">الفنانون</a>
+                <a href="{% url 'albums' %}">الألبومات</a>
+                <a href="{% url 'playlists' %}">قوائم التشغيل</a>
+                <a href="{% url 'categories' %}">التصنيفات</a>
+                <a href="{% url 'favorites' %}">المفضلة</a>
+                <a href="{% url 'legal_pages' %}">الصفحات القانونية</a>
+              </nav>
+            </section>
+
+            <section class="footer-link-group">
+              <h3>قانوني</h3>
+              <nav class="footer-links" aria-label="الروابط القانونية">
+                <a href="{% url 'legal_pages' %}">كل الصفحات القانونية</a>
+                {% for page in footer_legal_pages %}
+                  <a href="{% url 'legal_page_detail' page.slug %}">{{ page.title }}</a>
+                {% endfor %}
+              </nav>
+            </section>
+
+            <section class="footer-meta-group">
+              <h3>نبض المنصة</h3>
+              <div class="footer-stats-grid">
+                <div class="footer-stat">
+                  <span>المقاطع</span>
+                  <strong>{{ footer_stats.tracks }}</strong>
+                </div>
+                <div class="footer-stat">
+                  <span>الفنانون</span>
+                  <strong>{{ footer_stats.artists }}</strong>
+                </div>
+                <div class="footer-stat">
+                  <span>القوائم</span>
+                  <strong>{{ footer_stats.playlists }}</strong>
+                </div>
+                <div class="footer-stat">
+                  <span>الأسئلة</span>
+                  <strong>{{ footer_stats.faqs }}</strong>
+                </div>
+              </div>
+              {% if footer_featured_pages %}
+                <div class="footer-updates">
+                  <span class="eyebrow">آخر تحديثات الصفحات القانونية</span>
+                  {% for page in footer_featured_pages %}
+                    <a class="footer-update-link" href="{% url 'legal_page_detail' page.slug %}">
+                      <strong>{{ page.title }}</strong>
+                      <span class="muted">{{ page.updated_at|date:"Y-m-d" }}</span>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </section>
+          </div>
+
+          <div class="footer-bottom-row">
+            <p class="muted">© {{ current_year }} {{ site_settings.site_name }}. جميع الحقوق محفوظة.</p>
+            <div class="footer-bottom-links">
+              <a href="{% url 'robots_txt' %}">robots.txt</a>
+              <a href="{% url 'sitemap_xml' %}">sitemap.xml</a>
+              <a href="{% url 'legal_pages' %}">الخصوصية والشروط</a>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bottom-player glass-strong liquid-surface" aria-label="مشغل نغم" data-player-shell>
+    <button class="player-close icon-button glass" type="button" aria-label="إغلاق المشغل" data-player-close>
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <div class="bottom-player-inner">
+      <div class="player-identity">
+        <div class="mini-art" data-player-art>
+          {% block player_art %}
+            {% include "partials/media_placeholder.html" with icon="fa-microphone" label="" extra_class="mini" %}
+          {% endblock %}
+        </div>
+        <div class="player-copy">
+          <span class="player-kicker">{% block player_kicker %}مشغل نغم{% endblock %}</span>
+          <strong class="truncate" data-player-title>{% block player_title %}جاهز للاستماع{% endblock %}</strong>
+          <div class="muted truncate" data-player-artist>{% block player_artist %}صوت صافي بدون موسيقى{% endblock %}</div>
+          <div class="player-status-badges">
+            <span class="badge" data-player-mode>صوت نظيف</span>
+            <span class="badge" data-player-queue-count>0 في الطابور</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-center">
+        <div class="player-buttons">
+          <button class="player-control secondary" type="button" data-player-action="shuffle" aria-label="تبديل العشوائي">
+            <i class="fa-solid fa-shuffle"></i>
+          </button>
+          <button class="player-control secondary" type="button" data-player-action="prev" aria-label="السابق">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+          <button class="player-control primary" type="button" data-player-action="toggle" aria-label="تشغيل أو إيقاف">
+            <i class="fa-solid fa-play" data-player-icon></i>
+          </button>
+          <button class="player-control secondary" type="button" data-player-action="next" aria-label="التالي">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+          <button class="player-control secondary" type="button" data-player-action="repeat" aria-label="تبديل الإعادة">
+            <i class="fa-solid fa-repeat" data-player-repeat-icon></i>
+          </button>
+        </div>
+
+        <div class="player-progress-block">
+          <span class="player-time" data-player-current>0:00</span>
+          <div class="player-progress-shell">
+            <input class="player-progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="تقدم التشغيل" data-player-progress>
+            <div class="player-progress-fill" data-player-progress-fill></div>
+          </div>
+          <span class="player-time" data-player-duration>0:00</span>
+        </div>
+      </div>
+
+      <div class="player-side-meta">
+        <button class="player-tool" type="button" data-player-action="queue" aria-label="فتح الطابور">
+          <i class="fa-solid fa-list-ul"></i>
+        </button>
+        <button class="player-tool" type="button" data-player-action="mute" aria-label="كتم الصوت أو تشغيله">
+          <i class="fa-solid fa-volume-high" data-player-volume-icon></i>
+        </button>
+        <input class="player-volume" type="range" min="0" max="1" value="0.85" step="0.01" aria-label="مستوى الصوت" data-player-volume>
+        <button class="player-rate" type="button" data-player-action="rate" aria-label="سرعة التشغيل">1x</button>
+      </div>
+    </div>
+
+    <div class="player-queue-panel glass-deep" hidden data-player-queue-panel>
+      <div class="player-queue-head">
+        <div>
+          <span class="eyebrow">الطابور</span>
+          <strong>التشغيل القادم</strong>
+        </div>
+        <button class="button ghost compact" type="button" data-player-action="clear-local-queue">مسح الطابور المحلي</button>
+      </div>
+      <div class="player-queue-list" data-player-queue-list></div>
+    </div>
+
+    <audio class="player-audio" preload="metadata" {% block player_audio %}{% endblock %}></audio>
+    <div class="sr-only" aria-live="polite" data-player-status>المشغل جاهز.</div>
+  </footer>
+
+  <button class="back-to-top icon-button glass" type="button" aria-label="العودة إلى الأعلى" data-back-to-top>
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <script defer src="{% static 'js/desktop-ui.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

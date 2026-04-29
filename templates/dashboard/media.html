@@ -1,0 +1,67 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}الوسائط والأغلفة{% endblock %}
+{% block dashboard_intro %}قراءة سريعة لاكتمال الصور والأغلفة والأفاتارات داخل المنصة، مع أحدث العناصر المرفوعة التي قد تحتاج مراجعة أو تحسينًا بصريًا.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">التغطية</span><h2>اكتمال الوسائط</h2></div></div>
+      <div class="dashboard-stat-grid">
+        <div><span>مقاطع بغلاف</span><strong>{{ media_dashboard.coverage.tracks_with_cover }}</strong></div>
+        <div><span>مقاطع بدون غلاف</span><strong>{{ media_dashboard.coverage.tracks_without_cover }}</strong></div>
+        <div><span>ألبومات بغلاف</span><strong>{{ media_dashboard.coverage.albums_with_cover }}</strong></div>
+        <div><span>فنانون بصورة</span><strong>{{ media_dashboard.coverage.artists_with_image }}</strong></div>
+        <div><span>قوائم بغلاف</span><strong>{{ media_dashboard.coverage.playlists_with_cover }}</strong></div>
+        <div><span>حسابات بأفاتار</span><strong>{{ media_dashboard.coverage.profiles_with_avatar }}</strong></div>
+        <div><span>حسابات ببنر</span><strong>{{ media_dashboard.coverage.profiles_with_banner }}</strong></div>
+        <div><span>بنرات بوسائط</span><strong>{{ media_dashboard.coverage.banners_with_media }}</strong></div>
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">المقاطع</span><h2>أحدث الملفات الصوتية</h2></div></div>
+      <div class="dashboard-table">
+        {% for track in media_dashboard.latest_tracks %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ track.title }}</strong>
+              <p class="muted">{{ track.artist.name }}{% if track.cover %} • غلاف مرفوع{% else %} • بدون غلاف{% endif %}</p>
+            </div>
+            <div class="dashboard-visit-meta"><span>{{ track.duration_label }}</span><small>{{ track.created_at|date:"Y-m-d" }}</small></div>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الألبومات</span><h2>أحدث الألبومات</h2></div></div>
+      <div class="dashboard-table">
+        {% for album in media_dashboard.latest_albums %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ album.title }}</strong>
+              <p class="muted">{{ album.artist.name }}{% if album.cover %} • غلاف موجود{% else %} • بدون غلاف{% endif %}</p>
+            </div>
+            <div class="dashboard-visit-meta"><span>{% if album.release_date %}{{ album.release_date }}{% else %}بدون تاريخ{% endif %}</span><small>{{ album.created_at|date:"Y-m-d" }}</small></div>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">الحسابات</span><h2>أحدث تحديثات الملفات الشخصية</h2></div></div>
+      <div class="dashboard-table">
+        {% for profile in media_dashboard.latest_profiles %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ profile.name }}</strong>
+              <p class="muted">@{{ profile.user.username }}</p>
+            </div>
+            <div class="dashboard-visit-meta"><span>{% if profile.avatar %}أفاتار{% else %}بدون أفاتار{% endif %}</span><small>{{ profile.updated_at|date:"Y-m-d H:i" }}</small></div>
+          </div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

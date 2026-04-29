@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">مساحتك الخاصة</div>
+      <h1>مركز التحكم الشخصي</h1>
+      <p class="muted">الحفظ، القوائم، سجل الاستماع، الطابور، ومنشوراتك في لوحة واحدة أكثر وضوحًا وتنظيمًا.</p>
+    </div>
+    <div class="actions">
+      <a class="button primary" href="{% url 'discover' %}"><i class="fa-solid fa-compass"></i> اكتشف</a>
+      <a class="button ghost" href="{% url 'community' %}"><i class="fa-solid fa-users"></i> المجتمع</a>
+    </div>
+  </div>
+
+  {% if not user.is_authenticated %}
+    <div class="empty">سجّل الدخول لتفعيل مكتبتك الشخصية وحفظ اختياراتك ومتابعة المجتمع.</div>
+  {% endif %}
+</section>
+
+{% if user.is_authenticated %}
+<section class="section">
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <span>المحفوظات</span>
+      <strong>{{ library_stats.saved_tracks }}</strong>
+    </div>
+    <div class="dashboard-card">
+      <span>قوائمك</span>
+      <strong>{{ library_stats.playlists }}</strong>
+    </div>
+    <div class="dashboard-card">
+      <span>الطابور الحالي</span>
+      <strong>{{ library_stats.queue_items }}</strong>
+    </div>
+    <div class="dashboard-card">
+      <span>سجل الاستماع</span>
+      <strong>{{ library_stats.history_items }}</strong>
+    </div>
+    <div class="dashboard-card">
+      <span>الفنانون المتابعون</span>
+      <strong>{{ library_stats.followed_artists }}</strong>
+    </div>
+  </div>
+</section>
+
+{% if continue_listening %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">استئناف سريع</div>
+      <h2>استمر في الاستماع</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for track in continue_listening %}
+      {% include "partials/track_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section detail-panel profile-snapshot">
+  <div class="section-title">
+    <div>
+      <h2>حسابك</h2>
+      <span class="muted">خصّص هويتك وانشر تحديثاتك من نفس الصفحة.</span>
+    </div>
+    <div class="actions">
+      <a class="button" href="{% url 'profile_detail_self' %}"><i class="fa-solid fa-id-card"></i> الملف الشخصي</a>
+      <a class="button ghost" href="{% url 'profile_edit' %}"><i class="fa-solid fa-pen"></i> تعديل الحساب</a>
+    </div>
+  </div>
+
+  <div class="profile-snapshot-inner">
+    <div class="profile-snapshot-card">
+      <div class="profile-avatar large">
+        {% if user_profile.avatar %}
+          <img src="{{ user_profile.avatar.url }}" alt="{{ user.username }}">
+        {% else %}
+          {% include "partials/media_placeholder.html" with icon="fa-user" label="الصورة الشخصية" extra_class="compact" %}
+        {% endif %}
+      </div>
+      <div>
+        <h3>{{ user_profile.name|default:user.username }}</h3>
+        <p class="muted">{{ user_profile.bio|default:"أضف وصفًا قصيرًا وصورة شخصية لتظهر هويتك داخل نغم." }}</p>
+      </div>
+    </div>
+
+    <form class="post-form" action="{% url 'create_post' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label for="{{ post_form.body.id_for_label }}">منشور جديد</label>
+      {{ post_form.body }}
+      <label for="{{ post_form.image.id_for_label }}">صورة للمنشور</label>
+      {{ post_form.image }}
+      <button class="button primary" type="submit"><i class="fa-solid fa-paper-plane"></i> نشر</button>
+    </form>
+  </div>
+</section>
+
+<section class="section detail-panel">
+  <div class="section-title">
+    <div>
+      <h2>إنشاء قائمة تشغيل</h2>
+      <span class="muted">اجمع المقاطع حسب الوقت أو المزاج أو الفنان في ثوانٍ.</span>
+    </div>
+  </div>
+  <form class="playlist-create" action="{% url 'create_playlist' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="اسم القائمة" required>
+    <input type="text" name="description" placeholder="وصف قصير اختياري">
+    <label class="toggle-row"><input type="checkbox" name="is_public"> قائمة عامة</label>
+    <button class="button primary" type="submit"><i class="fa-solid fa-plus"></i> إنشاء</button>
+  </form>
+</section>
+
+{% if for_you_tracks %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">مقترح لك</div>
+      <h2>مزيج يعتمد على تفضيلاتك</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for track in for_you_tracks %}
+      {% include "partials/track_card.html" %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="section-title">
+    <h2>المقاطع المحفوظة</h2>
+    {% if saved_tracks_count %}
+      <span class="badge">{{ saved_tracks_count }} نتيجة</span>
+    {% endif %}
+  </div>
+  <form class="filters library-filters" method="get">
+    <input type="search" name="saved_q" value="{{ saved_query }}" placeholder="ابحث داخل محفوظاتك">
+    <select name="saved_mood">
+      <option value="">كل الأجواء</option>
+      {% for mood_value, mood_label in track_moods %}
+        <option value="{{ mood_value }}" {% if saved_mood == mood_value %}selected{% endif %}>{{ mood_label }}</option>
+      {% endfor %}
+    </select>
+    <select name="saved_sort">
+      <option value="recent" {% if saved_sort == "recent" %}selected{% endif %}>الأحدث حفظًا</option>
+      <option value="popular" {% if saved_sort == "popular" %}selected{% endif %}>الأكثر استماعًا</option>
+      <option value="title" {% if saved_sort == "title" %}selected{% endif %}>الاسم</option>
+    </select>
+    <button class="button primary" type="submit"><i class="fa-solid fa-sliders"></i> تطبيق</button>
+  </form>
+  <div class="grid">
+    {% for track in saved_tracks %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">لا توجد مقاطع محفوظة بعد.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <h2>قوائمك الخاصة</h2>
+  </div>
+  <div class="grid">
+    {% for playlist in playlists %}
+      <a class="card playlist-card" href="{% url 'playlist_detail' playlist.id %}">
+        <div class="art">
+          {% if playlist.cover %}
+            <img src="{{ playlist.cover.url }}" alt="{{ playlist.name }}">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-list-ul" label="غلاف القائمة" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ playlist.name }}</h3>
+        <p class="muted">{{ playlist.tracks_count }} مقطع • {% if playlist.is_public %}عامة{% else %}خاصة{% endif %}</p>
+      </a>
+    {% empty %}
+      <div class="empty">أنشئ أول قائمة من النموذج أعلاه.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <h2>سجل الاستماع</h2>
+  </div>
+  <div class="list">
+    {% for item in history %}
+      {% with track=item.track %}{% include "partials/track_row.html" %}{% endwith %}
+    {% empty %}
+      <div class="empty">سيظهر سجل الاستماع بعد تشغيل المقاطع.</div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <h2>قائمة التشغيل التالية</h2>
+    {% if queue %}
+      <span class="badge">{{ queue_duration_label }} مدة إجمالية</span>
+      <form class="inline-form" action="{% url 'clear_queue' %}" method="post">
+        {% csrf_token %}
+        <button class="button ghost" type="submit"><i class="fa-solid fa-trash"></i> مسح الطابور</button>
+      </form>
+    {% endif %}
+  </div>
+  <div class="list">
+    {% for item in queue %}
+      {% with track=item.track %}
+        <article class="media-row">
+          <a class="art" href="{% url 'track_detail' track.id %}">
+            {% if track.cover %}
+              <img src="{{ track.cover.url }}" alt="{{ track.title }}">
+            {% else %}
+              {% include "partials/media_placeholder.html" with icon="fa-microphone" label="بدون غلاف" extra_class="mini" %}
+            {% endif %}
+          </a>
+          <div class="track-row-copy">
+            <strong><a href="{% url 'track_detail' track.id %}">{{ track.title }}</a></strong>
+            <div class="muted truncate">{{ track.artist.name }}{% if track.album %} • {{ track.album.title }}{% endif %}</div>
+            <div class="track-row-meta">
+              {% if track.category %}<span class="badge">{{ track.category.name }}</span>{% endif %}
+              <span class="badge"><i class="fa-regular fa-clock"></i> {{ track.duration_label }}</span>
+            </div>
+          </div>
+          <form class="actions" action="{% url 'remove_from_queue' item.id %}" method="post">
+            {% csrf_token %}
+            <button class="icon-button" type="submit" aria-label="إزالة {{ track.title }} من الطابور" title="إزالة"><i class="fa-solid fa-xmark"></i></button>
+          </form>
+        </article>
+      {% endwith %}
+    {% empty %}
+      <div class="empty">لم تضف مقاطع للطابور بعد.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

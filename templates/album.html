@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicAlbum",
+  "name": "{{ album.title|escapejs }}",
+  "url": "{{ site_base_url }}{{ request.path }}",
+  "byArtist": {
+    "@type": "MusicGroup",
+    "name": "{{ album.artist.name|escapejs }}"
+  }{% if album.cover %},
+  "image": "{{ site_base_url }}{{ album.cover.url }}"{% endif %}{% if album.description %},
+  "description": "{{ album.description|escapejs }}"{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="detail-grid section">
+  <div class="detail-art">
+    {% if album.cover %}
+      <img src="{{ album.cover.url }}" alt="{{ album.title }}" decoding="async" fetchpriority="high">
+    {% else %}
+      {% include "partials/media_placeholder.html" with icon="fa-compact-disc" label="غلاف الألبوم" %}
+    {% endif %}
+  </div>
+  <div class="detail-panel">
+    <div class="eyebrow">ألبوم</div>
+    <h1>{{ album.title }}</h1>
+    <p class="muted">
+      <a href="{% url 'artist_detail' album.artist.id %}">{{ album.artist.name }}</a>
+      {% if album.category %} • {{ album.category.name }}{% endif %}
+    </p>
+    <div class="card-meta">
+      <span class="badge"><i class="fa-solid fa-list"></i> {{ album_track_count }} مقطع</span>
+      <span class="badge"><i class="fa-regular fa-clock"></i> {{ album_total_duration_label }} مدة المعاينة</span>
+    </div>
+    {% if album.description %}<p>{{ album.description }}</p>{% endif %}
+    {% if album_tracks_preview %}
+      {% with first_track=album_tracks_preview.0 %}
+      <div class="actions">
+        <button
+          class="button primary"
+          type="button"
+          data-player-track
+          data-track-id="{{ first_track.id }}"
+          data-track-title="{{ first_track.title }}"
+          data-track-artist="{{ first_track.artist.name }}"
+          data-track-src="{{ first_track.audio_file.url }}"
+          data-track-art="{% if first_track.cover %}{{ first_track.cover.url }}{% endif %}"
+          aria-label="تشغيل أول مقطع من {{ album.title }}"
+        >
+          <i class="fa-solid fa-play"></i> تشغيل من البداية
+        </button>
+      </div>
+      {% endwith %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">المحتوى</div>
+      <h2>مقاطع الألبوم</h2>
+    </div>
+  </div>
+  <div class="list">
+    {% for track in tracks %}
+      {% include "partials/track_row.html" %}
+    {% empty %}
+      <div class="empty">لا توجد مقاطع داخل هذا الألبوم.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=tracks_page %}
+</section>
+
+{% if related_albums %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">إصدارات مشابهة</div>
+      <h2>ألبومات قريبة</h2>
+    </div>
+  </div>
+  <div class="grid">
+    {% for related_album in related_albums %}
+      <a class="card" href="{% url 'album_detail' related_album.id %}">
+        <div class="art">
+          {% if related_album.cover %}
+            <img src="{{ related_album.cover.url }}" alt="{{ related_album.title }}" loading="lazy" decoding="async">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-compact-disc" label="غلاف الألبوم" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ related_album.title }}</h3>
+        <p class="muted">{{ related_album.artist.name }} • {{ related_album.tracks_count }} مقطع</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

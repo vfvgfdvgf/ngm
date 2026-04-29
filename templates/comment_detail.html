@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Comment",
+  "text": "{{ comment.body|escapejs }}",
+  "dateCreated": "{{ comment.created_at|date:'c' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ comment.user.profile.name|default:comment.user.username|escapejs }}"
+  },
+  "about": {
+    "@type": "CreativeWork",
+    "name": "{{ comment_target_title|escapejs }}"
+  }
+}
+</script>
+{% endblock %}
+{% block content %}
+<section class="detail-panel">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">تعليق مؤرشف</div>
+      <h1>{{ comment_target_title }}</h1>
+    </div>
+    <a class="button ghost" href="{{ comment_target_url }}">فتح الصفحة الأصلية</a>
+  </div>
+
+  <article class="comment comment-detail-card">
+    <div class="comment-detail-head">
+      <strong>{{ comment.user.profile.name|default:comment.user.username }}</strong>
+      <span class="muted">{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+    </div>
+    <p>{{ comment.body|linebreaksbr }}</p>
+  </article>
+
+  {% if comment_kind == "post" and comment_post %}
+    <div class="detail-panel">
+      <div class="section-title section-title-compact">
+        <h2>المنشور المرتبط</h2>
+      </div>
+      {% with post=comment_post %}
+        {% include "partials/post_card.html" %}
+      {% endwith %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

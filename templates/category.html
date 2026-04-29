@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="section-title">
+    <div>
+      <div class="eyebrow">تصنيف</div>
+      <h1>{{ category.name }}</h1>
+      {% if category.description %}<p class="muted">{{ category.description }}</p>{% endif %}
+    </div>
+    <a class="button" href="{% url 'categories' %}">كل التصنيفات</a>
+  </div>
+  <div class="grid">
+    {% for track in tracks %}
+      {% include "partials/track_card.html" %}
+    {% empty %}
+      <div class="empty">لا توجد مقاطع في هذا التصنيف.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=tracks_page %}
+</section>
+{% endblock %}

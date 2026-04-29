@@ -1,0 +1,18 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+  <section style="margin: 0 0 24px; padding: 24px; border-radius: 28px; border: 1px solid rgba(148, 86, 113, .18); background: linear-gradient(145deg, rgba(255,255,255,.88), rgba(255,247,244,.74)); box-shadow: 0 24px 60px -42px rgba(82, 31, 52, .34);">
+    <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; justify-content:space-between;">
+      <div style="max-width:720px;">
+        <p style="margin:0 0 8px; color:#945972; font-weight:700;">لوحة تشغيل نغم</p>
+        <h1 style="margin:0; color:#452432; font-size:2rem;">ابدأ من مركز القيادة بدل الصفحة التقليدية</h1>
+        <p style="margin:12px 0 0; color:#715061; line-height:1.8;">لوحة التحكم المخصصة تعرض الزيارات، الأداء، الحماية، وكثافة المحتوى في واجهة عربية واحدة للمدير والموظفين.</p>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        <a href="{% url 'staff_dashboard' %}" class="button default" style="padding:12px 18px; border-radius:999px;">فتح لوحة التحكم</a>
+        <a href="{% url 'home' %}" class="button" style="padding:12px 18px; border-radius:999px;">العودة إلى الموقع</a>
+      </div>
+    </div>
+  </section>
+  {{ block.super }}
+{% endblock %}

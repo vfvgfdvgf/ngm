@@ -1,0 +1,44 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}التقارير التشغيلية{% endblock %}
+{% block dashboard_intro %}مؤشرات شهرية تساعد الإدارة على قراءة النمو: التسجيلات الجديدة، النشر، التفاعل، والاستهلاك الفعلي داخل المنصة.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-kpis">
+    <article class="dashboard-kpi glass-panel"><span>تشغيلات الشهر</span><strong>{{ reports_dashboard.engagement.listens_month }}</strong><small>استماعات مسجلة</small></article>
+    <article class="dashboard-kpi glass-panel"><span>إعجابات المقاطع</span><strong>{{ reports_dashboard.engagement.likes_tracks }}</strong><small>كل الإعجابات</small></article>
+    <article class="dashboard-kpi glass-panel"><span>إعجابات المنشورات</span><strong>{{ reports_dashboard.engagement.likes_posts }}</strong><small>تفاعل المجتمع</small></article>
+    <article class="dashboard-kpi glass-panel"><span>المحفوظات</span><strong>{{ reports_dashboard.engagement.saved_tracks }}</strong><small>عمليات حفظ</small></article>
+    <article class="dashboard-kpi glass-panel danger"><span>عناصر الطابور</span><strong>{{ reports_dashboard.engagement.queue_items }}</strong><small>نشاط الاستماع</small></article>
+  </section>
+
+  <section class="dashboard-grid dashboard-grid-primary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">التسجيلات</span><h2>تقرير الانضمام اليومي</h2></div></div>
+      <div class="dashboard-chart">
+        {% for item in reports_dashboard.signup_cards %}
+          <div class="dashboard-chart-col">
+            <span class="dashboard-chart-value">{{ item.total }}</span>
+            <div class="dashboard-chart-bar-shell">
+              <span class="dashboard-chart-bar" style="height: {{ item.height }}%"></span>
+            </div>
+            <small>{{ item.label }}</small>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات تسجيل شهرية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head"><div><span class="dashboard-kicker">النشر</span><h2>إيقاع المحتوى خلال 30 يومًا</h2></div></div>
+      <div class="dashboard-stat-grid">
+        <div><span>المقاطع</span><strong>{{ reports_dashboard.publishing.tracks_month }}</strong></div>
+        <div><span>الألبومات</span><strong>{{ reports_dashboard.publishing.albums_month }}</strong></div>
+        <div><span>القوائم</span><strong>{{ reports_dashboard.publishing.playlists_month }}</strong></div>
+        <div><span>المنشورات</span><strong>{{ reports_dashboard.publishing.posts_month }}</strong></div>
+        <div><span>التعليقات</span><strong>{{ reports_dashboard.publishing.comments_month }}</strong></div>
+      </div>
+    </article>
+  </section>
+{% endblock %}

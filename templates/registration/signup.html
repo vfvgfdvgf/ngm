@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-wrap auth-page-shell" aria-label="إنشاء حساب">
+  <section class="auth-card auth-card-wide">
+    <a class="brand" href="{% url 'home' %}">
+      <span class="brand-mark"><i class="fa-solid fa-microphone-lines"></i></span>
+      <span>نغم</span>
+    </a>
+
+    <div class="auth-header">
+      <div class="eyebrow">حساب جديد</div>
+      <h1>ابدأ مكتبتك الصوتية</h1>
+      <p class="muted">أنشئ حسابًا لتحتفظ بالمفضلة وتبني قوائم التشغيل وتتابع المنشدين الذين تحبهم وتنشر تحديثاتك.</p>
+    </div>
+
+    <form class="auth-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-errors">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="field-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <p class="field-help">{{ field.help_text }}</p>
+          {% endif %}
+          {% if field.errors %}
+            <div class="field-error">
+              {% for error in field.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button class="button primary auth-submit" type="submit">
+        <i class="fa-solid fa-user-plus"></i>
+        إنشاء الحساب
+      </button>
+    </form>
+
+    <p class="muted auth-switch">لديك حساب بالفعل؟ <a href="{% url 'login' %}">سجل الدخول</a></p>
+  </section>
+</section>
+{% endblock %}

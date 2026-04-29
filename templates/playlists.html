@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}قوائم التشغيل • نغم{% endblock %}
+
+{% block content %}
+<section class="section">
+  <h1>قوائم التشغيل العامة</h1>
+  <div class="grid">
+    {% for playlist in playlists %}
+      <a class="card" href="{% url 'playlist_detail' playlist.id %}">
+        <div class="art">
+          {% if playlist.cover %}
+            <img src="{{ playlist.cover.url }}" alt="{{ playlist.name }}">
+          {% else %}
+            {% include "partials/media_placeholder.html" with icon="fa-list-ul" label="غلاف القائمة" extra_class="compact" %}
+          {% endif %}
+        </div>
+        <h3>{{ playlist.name }}</h3>
+        <p class="muted">{{ playlist.tracks_count }} مقطع • بواسطة {{ playlist.user.username }}</p>
+      </a>
+    {% empty %}
+      <div class="empty">لا توجد قوائم عامة بعد.</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" with page_obj=playlists_page %}
+</section>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "dashboard/_base.html" %}
+
+{% block dashboard_title %}المحتوى والمجتمع{% endblock %}
+{% block dashboard_intro %}صفحة تشغيل مركزة على أفضل المقاطع، أكثر الفنانين حضورًا، آخر القوائم، وآخر منشورات المجتمع حتى يسهل متابعة النمو والتحرير.{% endblock %}
+
+{% block dashboard_body %}
+  <section class="dashboard-grid dashboard-grid-secondary">
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المقاطع</span><h2>الأكثر حضورًا</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for track in content_dashboard.top_tracks %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ track.title }}</strong>
+              <p class="muted">{{ track.artist.name }}{% if track.album %} • {{ track.album.title }}{% endif %}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ track.views }} مشاهدة</span>
+              <small>{{ track.likes_total }} إعجاب • {{ track.comments_total }} تعليق</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد مقاطع منشورة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">الفنانون</span><h2>الأكثر نموًا</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for artist in content_dashboard.top_artists %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ artist.name }}</strong>
+              <p class="muted">{{ artist.bio|default:"بدون نبذة"|truncatechars:80 }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ artist.followers_total }} متابع</span>
+              <small>{{ artist.tracks_total }} مقطع</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد بيانات فنانين كافية بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">المنشورات</span><h2>آخر نشاط المجتمع</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for post in content_dashboard.latest_posts %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ post.user.username }}</strong>
+              <p class="muted">{{ post.body|truncatechars:110 }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ post.likes_total }} إعجاب</span>
+              <small>{{ post.comments_total }} تعليق</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد منشورات منشورة بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+
+    <article class="dashboard-panel glass-panel">
+      <div class="dashboard-panel-head">
+        <div><span class="dashboard-kicker">القوائم</span><h2>آخر القوائم المحدثة</h2></div>
+      </div>
+      <div class="dashboard-table">
+        {% for playlist in content_dashboard.latest_playlists %}
+          <div class="dashboard-table-row">
+            <div>
+              <strong>{{ playlist.name }}</strong>
+              <p class="muted">{{ playlist.user.username }}</p>
+            </div>
+            <div class="dashboard-visit-meta">
+              <span>{{ playlist.tracks_total }} مقطع</span>
+              <small>{{ playlist.updated_at|date:"Y-m-d H:i" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dashboard-empty">لا توجد قوائم تشغيل بعد.</div>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+{% endblock %}

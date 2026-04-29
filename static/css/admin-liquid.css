@@ -1,0 +1,129 @@
+html[dir="rtl"] body,
+html[dir="rtl"] .dashboard,
+html[dir="rtl"] #container {
+  direction: rtl;
+  text-align: right;
+}
+
+body.login,
+body {
+  background:
+    radial-gradient(circle at top right, rgba(194, 121, 145, 0.16), transparent 28%),
+    linear-gradient(180deg, #fcfaf7, #f8f1ea);
+}
+
+#header {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  border-bottom: 1px solid rgba(145, 82, 104, 0.14);
+  box-shadow: 0 14px 42px rgba(106, 32, 55, 0.08);
+}
+
+.admin-branding {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #7f2945;
+  background: linear-gradient(160deg, rgba(127, 41, 69, 0.16), rgba(127, 41, 69, 0.04));
+  border: 1px solid rgba(127, 41, 69, 0.16);
+}
+
+.admin-brand-copy h1,
+.admin-brand-copy p {
+  margin: 0;
+}
+
+.admin-brand-copy p {
+  color: #7a6a67;
+  font-size: 12px;
+}
+
+#site-name a,
+#header a:link,
+#header a:visited {
+  color: #5a2036;
+}
+
+#user-tools {
+  font-size: 12px;
+}
+
+#content,
+.module,
+#changelist,
+.dashboard .module,
+.inline-group,
+.submit-row,
+.breadcrumbs {
+  border-radius: 18px;
+}
+
+.module,
+.inline-group,
+#changelist,
+.submit-row,
+.breadcrumbs,
+.selector,
+.selector-available h2,
+.selector-chosen h2 {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(145, 82, 104, 0.12);
+  box-shadow: 0 14px 34px rgba(106, 32, 55, 0.06);
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+  background: linear-gradient(135deg, rgba(127, 41, 69, 0.88), rgba(96, 30, 52, 0.82));
+  border-radius: 16px 16px 0 0;
+}
+
+div.breadcrumbs {
+  color: #6f5c59;
+}
+
+div.breadcrumbs a {
+  color: #7f2945;
+}
+
+input,
+textarea,
+select,
+.vTextField,
+.vURLField,
+.vLargeTextField {
+  border-radius: 12px !important;
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+  border-radius: 999px !important;
+}
+
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+  background: linear-gradient(135deg, #8c3450, #6f233f);
+}
+
+#nav-sidebar {
+  background: rgba(255, 255, 255, 0.66);
+  border-left: 1px solid rgba(145, 82, 104, 0.1);
+}
+
+#nav-sidebar .current-model {
+  background: rgba(127, 41, 69, 0.08);
+}
