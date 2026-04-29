@@ -2,7 +2,21 @@
 <section class="banner-slot banner-slot-{{ slot_name }}">
   <div class="banner-slot-grid">
     {% for banner in banners %}
-    <article class="page-banner banner-size-{{ banner.size }} {% if banner.image_url %}has-image{% endif %}" {% if banner.image_url %}style="background-image: url('{{ banner.image_url }}');"{% endif %}>
+    <article class="page-banner banner-size-{{ banner.size }} {% if banner.image_url %}has-image{% endif %}">
+      {% if banner.image_url %}
+        <img
+          class="page-banner-media"
+          src="{{ banner.image_url }}"
+          alt=""
+          decoding="async"
+          {% if slot_name == "top" and forloop.first %}
+            loading="eager"
+            fetchpriority="high"
+          {% else %}
+            loading="lazy"
+          {% endif %}
+        >
+      {% endif %}
       <div class="page-banner-copy">
         {% if banner.eyebrow %}
           <div class="eyebrow">{{ banner.eyebrow }}</div>

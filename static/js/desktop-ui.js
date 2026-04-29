@@ -23,9 +23,10 @@
   );
   const revealTargets = Array.from(
     document.querySelectorAll(
-      ".hero-copy, .hero-panel, .section, .page-banner, .detail-panel, .announcement, .notice-banner, .showcase-panel"
+      ".section, .detail-panel, .announcement, .notice-banner, .showcase-panel"
     )
   );
+  const liquidRects = new WeakMap();
 
   let ambientFrame = null;
   let ambientPointer = { x: 0.5, y: 0.5 };
@@ -101,8 +102,20 @@
     backToTop.classList.toggle("is-visible", window.scrollY > 560);
   }
 
-  function updatePointerGlow(element, event) {
+  function getLiquidRect(element) {
+    const cachedRect = liquidRects.get(element);
+    if (cachedRect) return cachedRect;
     const rect = element.getBoundingClientRect();
+    liquidRects.set(element, rect);
+    return rect;
+  }
+
+  function invalidateLiquidRects() {
+    liquidTargets.forEach((element) => liquidRects.delete(element));
+  }
+
+  function updatePointerGlow(element, event) {
+    const rect = getLiquidRect(element);
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
     element.style.setProperty("--pointer-x", `${Math.max(0, Math.min(100, x))}%`);
@@ -113,12 +126,16 @@
     if (!enhancedMotionEnabled || performanceMode !== "full") return;
 
     liquidTargets.forEach((element) => {
+      element.addEventListener("pointerenter", () => {
+        liquidRects.set(element, element.getBoundingClientRect());
+      });
+
       element.addEventListener("pointermove", (event) => {
         updatePointerGlow(element, event);
         element.classList.add("is-liquid-active");
 
         if (element.matches(".card, .quick-action-card, .post-card, .media-row, .stat, .dashboard-card, .spotlight-card")) {
-          const rect = element.getBoundingClientRect();
+          const rect = getLiquidRect(element);
           const rotateY = ((event.clientX - rect.left) / rect.width - 0.5) * -8;
           const rotateX = ((event.clientY - rect.top) / rect.height - 0.5) * 6;
           element.style.setProperty("--card-rotate-x", `${rotateX}deg`);
@@ -134,6 +151,9 @@
         element.classList.remove("is-liquid-active");
       });
     });
+
+    window.addEventListener("resize", invalidateLiquidRects, { passive: true });
+    window.addEventListener("scroll", invalidateLiquidRects, { passive: true });
   }
 
   function setupRevealAnimation() {

@@ -33,10 +33,10 @@
   <link rel="alternate" hreflang="ar" href="{{ site_base_url }}{{ page_canonical|default:request.path }}">
   <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  {% if page_banner_image_url %}
+    <link rel="preload" href="{{ page_banner_image_url }}" as="image" fetchpriority="high">
+  {% endif %}
   <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahsans/woff2/thmanyahsans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahsans/woff2/thmanyahsans-Bold.woff2' %}" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="{% static 'thmanyahtypeface/thmanyahserifdisplay/woff2/thmanyahserifdisplay-Medium.woff2' %}" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="{% static 'js/desktop-ui.js' %}" as="script">
   <script>
     (function () {
       try {
@@ -53,6 +53,23 @@
       }
     })();
   </script>
+  <style>
+    html,body{margin:0;padding:0}
+    body{min-height:100vh;background:#f4ebdf;color:#341620;font-family:"Thmanyah Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .app-main-inner{width:min(1400px,calc(100% - 24px));margin:0 auto;padding:16px 0 120px}
+    .banner-slot,.hero{display:grid;gap:16px}
+    .page-banner,.hero-copy,.hero-panel{position:relative;overflow:hidden;border-radius:32px}
+    .page-banner{min-height:300px;padding:32px;display:flex;align-items:flex-end;background:linear-gradient(135deg,#7e324c,#4d1627)}
+    .page-banner-copy,.hero-copy,.hero-panel{position:relative;z-index:2}
+    .page-banner h2,.hero h1{margin:0 0 12px;color:#fff9f3;line-height:1.08}
+    .page-banner p,.hero p{margin:0;color:rgba(255,249,242,.92);line-height:1.7}
+    .page-banner-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .glass-panel{background:rgba(255,249,242,.82);backdrop-filter:blur(16px);border:1px solid rgba(105,34,53,.12);box-shadow:0 12px 32px rgba(106,32,55,.08)}
+    .actions{display:flex;flex-wrap:wrap;gap:12px}
+    .button{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:999px;text-decoration:none}
+    .button.primary{background:#6a2037;color:#fff}
+    .button.ghost{background:rgba(255,255,255,.66);color:#341620}
+  </style>
   {% if page_noindex or global_seo.noindex %}
     <meta name="robots" content="noindex,nofollow">
   {% else %}
@@ -130,7 +147,24 @@
   ]
   </script>
   {% block structured_data %}{% endblock %}
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" crossorigin onload="this.onload=null;this.rel='stylesheet'">
+  <script>
+    (function () {
+      var loadIcons = function () {
+        if (document.querySelector('link[data-fa-icons]')) return;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+        link.crossOrigin = 'anonymous';
+        link.setAttribute('data-fa-icons', 'true');
+        document.head.appendChild(link);
+      };
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadIcons, { timeout: 1200 });
+      } else {
+        window.addEventListener('load', loadIcons, { once: true });
+      }
+    })();
+  </script>
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link rel="stylesheet" href="{% static 'css/mobile.css' %}">
   <link rel="stylesheet" href="{% static 'css/desktop.css' %}" media="screen and (min-width: 961px)">

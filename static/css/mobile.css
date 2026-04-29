@@ -873,6 +873,16 @@ button,
   align-items: flex-end;
 }
 
+.page-banner-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
 .page-banner::before {
   content: "";
   position: absolute;
@@ -896,11 +906,6 @@ button,
     rgba(106, 32, 55, 0.2) 100%
   );
   z-index: 1;
-}
-
-.page-banner.has-image {
-  background-position: center;
-  background-size: cover;
 }
 
 .page-banner-copy {
@@ -1001,6 +1006,8 @@ button,
 .section {
   display: grid;
   gap: var(--space-xl);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
 }
 
 .section-title {
@@ -3340,14 +3347,11 @@ textarea:focus-visible {
     0 12px 36px rgba(106, 32, 55, 0.12);
 }
 
-body[data-ui-ready="true"] .hero-copy,
-body[data-ui-ready="true"] .hero-panel,
 body[data-ui-ready="true"] .section,
 body[data-ui-ready="true"] .card,
 body[data-ui-ready="true"] .quick-action-card,
 body[data-ui-ready="true"] .post-card,
 body[data-ui-ready="true"] .media-row,
-body[data-ui-ready="true"] .page-banner,
 body[data-ui-ready="true"] .detail-panel,
 body[data-ui-ready="true"] .announcement,
 body[data-ui-ready="true"] .notice-banner {
@@ -3389,14 +3393,11 @@ body[data-ui-ready="true"] .notice-banner {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body[data-ui-ready="true"] .hero-copy,
-  body[data-ui-ready="true"] .hero-panel,
   body[data-ui-ready="true"] .section,
   body[data-ui-ready="true"] .card,
   body[data-ui-ready="true"] .quick-action-card,
   body[data-ui-ready="true"] .post-card,
   body[data-ui-ready="true"] .media-row,
-  body[data-ui-ready="true"] .page-banner,
   body[data-ui-ready="true"] .detail-panel,
   body[data-ui-ready="true"] .announcement,
   body[data-ui-ready="true"] .notice-banner,
