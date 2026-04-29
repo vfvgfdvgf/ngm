@@ -1,7 +1,7 @@
 {% extends "dashboard/_base.html" %}
 
 {% block dashboard_title %}هوية المنصة{% endblock %}
-{% block dashboard_intro %}من هنا تقدر تعدل اسم الموقع، الشعار النصي، شعار المنصة، وfavicon مباشرة من لوحة التحكم بدون الحاجة إلى Django Admin.{% endblock %}
+{% block dashboard_intro %}من هنا تعدّل اسم الموقع والشعار والـ favicon والدومين الأساسي، وتضيف كود التحقق من Google أو أي أكواد داخل head مباشرة من لوحة التحكم بدون الرجوع إلى ملفات المشروع.{% endblock %}
 
 {% block dashboard_body %}
   <section class="dashboard-grid dashboard-grid-secondary">
@@ -9,14 +9,14 @@
       <div class="dashboard-panel-head">
         <div>
           <span class="dashboard-kicker">التخصيص</span>
-          <h2>إعدادات الشعار و favicon</h2>
+          <h2>الهوية والتحقق</h2>
         </div>
       </div>
 
       <form method="post" enctype="multipart/form-data" class="dashboard-form-grid two">
         {% csrf_token %}
         {% for field in branding_form %}
-          <label class="dashboard-form-field {% if field.name == 'logo' or field.name == 'favicon' %}is-full{% endif %}">
+          <label class="dashboard-form-field {% if field.name == 'logo' or field.name == 'favicon' or field.name == 'custom_head_code' or field.name == 'verification_file_content' or field.name == 'analytics_code' %}is-full{% endif %}">
             <span>{{ field.label }}</span>
             {{ field }}
             {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
@@ -24,6 +24,12 @@
           </label>
         {% endfor %}
         {% for error in branding_form.non_field_errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+        <div class="dashboard-note-card is-full">
+          <strong>ملاحظات سريعة</strong>
+          <p>ضع في `Google site verification` قيمة `content` فقط إذا أعطاك Google ميتا تاج جاهز.</p>
+          <p>استخدم `Custom head code` لأي meta أو script إضافي مثل Search Console أو أدوات التحليل.</p>
+          <p>إذا طلبت Google ملف تحقق، اكتب اسمه في `اسم ملف التحقق` ومحتواه في `محتوى ملف التحقق` وسيصبح متاحًا مباشرة على الموقع.</p>
+        </div>
         <div class="dashboard-actions-row">
           <button class="dashboard-button primary" type="submit">حفظ الهوية</button>
           <a class="dashboard-button" href="{% url 'staff_dashboard_settings' %}">العودة للإعدادات</a>
@@ -50,7 +56,7 @@
         </div>
 
         <div class="dashboard-media-card favicon">
-          <span>favicon الحالي</span>
+          <span>الأيقونة الحالية</span>
           {% if branding_settings.favicon %}
             <img src="{{ branding_settings.favicon.url }}" alt="Favicon">
           {% elif branding_settings.logo %}
@@ -64,6 +70,9 @@
       <div class="dashboard-insight-list">
         <div class="dashboard-insight-row"><span>اسم الموقع</span><strong>{{ branding_settings.site_name }}</strong></div>
         <div class="dashboard-insight-row"><span>الشعار النصي</span><strong>{{ branding_settings.tagline }}</strong></div>
+        <div class="dashboard-insight-row"><span>الدومين الأساسي</span><strong class="mono">{{ branding_settings.canonical_domain|default:"غير محدد" }}</strong></div>
+        <div class="dashboard-insight-row"><span>Google verification</span><strong class="mono">{{ branding_settings.google_site_verification|default:"غير مضاف" }}</strong></div>
+        <div class="dashboard-insight-row"><span>ملف التحقق</span><strong class="mono">{{ branding_settings.verification_file_name|default:"غير مضاف" }}</strong></div>
         <div class="dashboard-insight-row"><span>زر الهيدر</span><strong>{{ branding_settings.header_cta_label }}</strong></div>
         <div class="dashboard-insight-row"><span>رابط الزر</span><strong class="mono">{{ branding_settings.header_cta_url }}</strong></div>
       </div>

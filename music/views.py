@@ -1,5 +1,7 @@
 import random
+from io import BytesIO
 from datetime import timedelta
+from mimetypes import guess_type
 from urllib.parse import urlencode
 
 from django.contrib import admin
@@ -12,7 +14,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Avg, BooleanField, Count, Exists, F, OuterRef, Prefetch, Q, Value
 from django.db.models.functions import TruncDate
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.cache import patch_cache_control
 from django.utils import timezone
@@ -50,6 +52,7 @@ from .models import (
     SEOPage,
     SecurityEvent,
     SiteSettings,
+    StoredMediaFile,
     Track,
     TrackComment,
     UserPost,
@@ -92,6 +95,34 @@ def safe_redirect_back(request, fallback_name):
 
 def is_staff_user(user):
     return bool(user and user.is_authenticated and user.is_staff)
+
+
+def _parse_http_range(range_header, total_size):
+    if not range_header or not range_header.startswith("bytes="):
+        return None
+
+    try:
+        range_value = range_header.split("=", 1)[1].split(",", 1)[0].strip()
+        if "-" not in range_value:
+            return None
+
+        start_str, end_str = range_value.split("-", 1)
+        if start_str == "":
+            suffix_length = int(end_str)
+            if suffix_length <= 0:
+                return None
+            start = max(total_size - suffix_length, 0)
+            end = total_size - 1
+        else:
+            start = int(start_str)
+            end = int(end_str) if end_str else total_size - 1
+    except (TypeError, ValueError):
+        return None
+
+    if start < 0 or end < start or start >= total_size:
+        return None
+
+    return start, min(end, total_size - 1)
 
 
 def signup(request):
@@ -1666,6 +1697,42 @@ def post_comment_detail(request, comment_id):
             "page_canonical": reverse("post_comment_detail", args=[comment.id]),
         },
     )
+
+
+def media_file(request, file_key):
+    stored = get_object_or_404(StoredMediaFile, file_key=file_key)
+    content_type = stored.content_type or guess_type(stored.original_name or stored.file_key)[0] or "application/octet-stream"
+    total_size = stored.size or len(stored.content)
+    range_header = request.headers.get("Range") or request.META.get("HTTP_RANGE", "")
+    byte_range = _parse_http_range(range_header, total_size)
+
+    if byte_range:
+        start, end = byte_range
+        chunk = bytes(stored.content[start : end + 1])
+        response = HttpResponse(chunk, status=206, content_type=content_type)
+        response["Content-Range"] = f"bytes {start}-{end}/{total_size}"
+        response["Content-Length"] = str(len(chunk))
+    else:
+        response = FileResponse(BytesIO(bytes(stored.content)), content_type=content_type)
+        response["Content-Length"] = str(total_size)
+
+    response["Accept-Ranges"] = "bytes"
+    response["Cache-Control"] = "public, max-age=31536000, immutable"
+    return response
+
+
+def site_verification_file(request, verification_filename):
+    site_settings = SiteSettings.load()
+    if (
+        not site_settings.verification_file_name
+        or site_settings.verification_file_name.strip() != verification_filename
+        or not site_settings.verification_file_content.strip()
+    ):
+        raise Http404("Verification file not configured.")
+
+    response = HttpResponse(site_settings.verification_file_content, content_type="text/html; charset=utf-8")
+    response["Cache-Control"] = "public, max-age=300"
+    return response
 
 
 @require_POST

@@ -678,6 +678,25 @@ a {
   padding: 10px 12px;
 }
 
+.dashboard-note-card {
+  grid-column: 1 / -1;
+  padding: 16px 18px;
+  border: 1px solid rgba(126, 50, 76, 0.14);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 250, 244, 0.95), rgba(250, 239, 229, 0.9));
+}
+
+.dashboard-note-card strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.dashboard-note-card p {
+  margin: 8px 0 0;
+  color: var(--dashboard-text-soft);
+  line-height: 1.7;
+}
+
 .dashboard-form-field small,
 .form-error {
   color: var(--dashboard-text-soft);

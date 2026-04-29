@@ -18,6 +18,9 @@
     <meta name="keywords" content="{% if page_keywords %}{{ page_keywords }}{% else %}{{ site_settings.default_keywords }}{% endif %}">
   {% endif %}
   <meta name="color-scheme" content="light dark">
+  {% if site_settings.google_site_verification %}
+    <meta name="google-site-verification" content="{{ site_settings.google_site_verification }}">
+  {% endif %}
   {% if site_settings.favicon %}
     <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}">
     <link rel="shortcut icon" href="{{ site_settings.favicon.url }}">
@@ -140,6 +143,9 @@
       gtag('js', new Date());
       gtag('config', '{{ analytics_id }}');
     </script>
+  {% endif %}
+  {% if site_settings.custom_head_code %}
+    {{ site_settings.custom_head_code|safe }}
   {% endif %}
 </head>
 <body data-ui-shell data-user-authenticated="{{ user.is_authenticated|yesno:'true,false' }}" data-login-url="{% url 'login' %}" data-create-post-url="{% url 'create_post' %}">

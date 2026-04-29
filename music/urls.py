@@ -1,9 +1,15 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
 urlpatterns = [
     path("", views.home, name="home"),
+    path("media/<path:file_key>", views.media_file, name="media_file"),
+    re_path(
+        r"^(?P<verification_filename>google[a-zA-Z0-9_-]+\.html)$",
+        views.site_verification_file,
+        name="site_verification_file",
+    ),
     path("control/", views.staff_dashboard, name="staff_dashboard"),
     path("control/visitors/", views.staff_dashboard_visitors, name="staff_dashboard_visitors"),
     path("control/content/", views.staff_dashboard_content, name="staff_dashboard_content"),

@@ -1,3 +1,4 @@
+from django.core.files.base import ContentFile
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -126,3 +127,36 @@ class SiteExperienceTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "community/")
         self.assertContains(response, "images.unsplash.com")
+
+    def test_google_verification_meta_and_custom_head_code_render(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.google_site_verification = "google-token-123"
+        settings_obj.custom_head_code = '<meta name="custom-check" content="ok">'
+        settings_obj.save()
+
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            '<meta name="google-site-verification" content="google-token-123">',
+            html=True,
+        )
+        self.assertContains(response, '<meta name="custom-check" content="ok">', html=False)
+
+    def test_google_verification_file_route(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.verification_file_name = "googleabc123.html"
+        settings_obj.verification_file_content = "google-site-verification: googleabc123.html"
+        settings_obj.save()
+
+        response = self.client.get("/googleabc123.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "google-site-verification: googleabc123.html")
+
+    def test_database_media_storage_serves_uploaded_file(self):
+        settings_obj = SiteSettings.load()
+        settings_obj.logo.save("branding/logo.png", ContentFile(b"fake-image-bytes", name="logo.png"), save=True)
+
+        response = self.client.get(settings_obj.logo.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(response.streaming_content), b"fake-image-bytes")

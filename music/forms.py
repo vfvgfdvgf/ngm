@@ -255,12 +255,32 @@ class SiteBrandingForm(forms.ModelForm):
             "tagline",
             "logo",
             "favicon",
+            "canonical_domain",
+            "analytics_code",
+            "google_site_verification",
+            "custom_head_code",
+            "verification_file_name",
+            "verification_file_content",
             "header_cta_label",
             "header_cta_url",
         )
         widgets = {
             "site_name": forms.TextInput(attrs={"placeholder": "اسم المنصة"}),
             "tagline": forms.TextInput(attrs={"placeholder": "وصف قصير يظهر تحت اسم الموقع"}),
+            "canonical_domain": forms.URLInput(attrs={"placeholder": "https://example.com"}),
+            "analytics_code": forms.Textarea(attrs={"rows": 3, "placeholder": "G-XXXX أو كود Analytics كامل"}),
+            "google_site_verification": forms.TextInput(
+                attrs={"placeholder": "ألصق قيمة content فقط أو الرمز الذي يعطيك إياه Google"}
+            ),
+            "custom_head_code": forms.Textarea(
+                attrs={"rows": 5, "placeholder": '<meta ...> أو <script ...></script>'}
+            ),
+            "verification_file_name": forms.TextInput(
+                attrs={"placeholder": "google1234567890abcdef.html"}
+            ),
+            "verification_file_content": forms.Textarea(
+                attrs={"rows": 4, "placeholder": "google-site-verification: google1234567890abcdef.html"}
+            ),
             "header_cta_label": forms.TextInput(attrs={"placeholder": "نص زر الهيدر"}),
             "header_cta_url": forms.TextInput(attrs={"placeholder": "/signup/ أو رابط مخصص"}),
         }
@@ -270,6 +290,18 @@ class SiteBrandingForm(forms.ModelForm):
         for field in self.fields.values():
             css_class = field.widget.attrs.get("class", "")
             field.widget.attrs["class"] = f"{css_class} auth-input".strip()
+        self.fields["site_name"].label = "اسم الموقع"
+        self.fields["tagline"].label = "الشعار النصي"
+        self.fields["logo"].label = "الشعار"
+        self.fields["favicon"].label = "الأيقونة"
+        self.fields["canonical_domain"].label = "الدومين الأساسي"
+        self.fields["analytics_code"].label = "Analytics code"
+        self.fields["google_site_verification"].label = "Google site verification"
+        self.fields["custom_head_code"].label = "Custom head code"
+        self.fields["verification_file_name"].label = "اسم ملف التحقق"
+        self.fields["verification_file_content"].label = "محتوى ملف التحقق"
+        self.fields["header_cta_label"].label = "نص زر الهيدر"
+        self.fields["header_cta_url"].label = "رابط زر الهيدر"
 
     def _validate_uploaded_image(self, field_name, label):
         image = self.cleaned_data.get(field_name)
@@ -286,3 +318,27 @@ class SiteBrandingForm(forms.ModelForm):
 
     def clean_favicon(self):
         return self._validate_uploaded_image("favicon", "الأيقونة")
+
+    def clean_google_site_verification(self):
+        value = (self.cleaned_data.get("google_site_verification") or "").strip()
+        if not value:
+            return ""
+        if 'content="' in value:
+            marker = 'content="'
+            start = value.find(marker)
+            if start != -1:
+                start += len(marker)
+                end = value.find('"', start)
+                if end != -1:
+                    return value[start:end].strip()
+        return value
+
+    def clean_verification_file_name(self):
+        value = (self.cleaned_data.get("verification_file_name") or "").strip()
+        if not value:
+            return ""
+        if "/" in value or "\\" in value:
+            raise ValidationError("اسم ملف التحقق يجب أن يكون اسم ملف فقط بدون مسارات.")
+        if not value.endswith(".html"):
+            raise ValidationError("ملف التحقق يجب أن ينتهي بـ .html")
+        return value

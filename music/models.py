@@ -60,6 +60,17 @@ class SiteSettings(models.Model):
     og_image = models.ImageField(upload_to="seo/", null=True, blank=True)
     canonical_domain = models.URLField(blank=True, help_text="مثال: https://nagham.example.com")
     analytics_code = models.TextField(blank=True, help_text="كود Analytics اختياري.")
+    google_site_verification = models.CharField(max_length=255, blank=True)
+    custom_head_code = models.TextField(blank=True, help_text="Any verification or analytics tags rendered inside head.")
+    verification_file_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Example: google1234567890abcdef.html",
+    )
+    verification_file_content = models.TextField(
+        blank=True,
+        help_text="Content returned by the verification file endpoint.",
+    )
     header_cta_label = models.CharField(max_length=80, default="جرّب الآن")
     header_cta_url = models.CharField(max_length=200, default="/signup/")
     maintenance_message = models.CharField(max_length=240, blank=True)
@@ -506,3 +517,19 @@ class VisitEvent(models.Model):
 
     def __str__(self):
         return f"{self.path} - {self.ip_address}"
+
+
+class StoredMediaFile(models.Model):
+    file_key = models.CharField(max_length=500, unique=True)
+    original_name = models.CharField(max_length=255, blank=True)
+    content_type = models.CharField(max_length=120, blank=True)
+    size = models.PositiveBigIntegerField(default=0)
+    content = models.BinaryField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["file_key"]
+
+    def __str__(self):
+        return self.file_key

@@ -17,6 +17,7 @@ from .models import (
     SEOPage,
     SiteSettings,
     BlockedIP,
+    StoredMediaFile,
     Track,
     TrackComment,
     UserPost,
@@ -36,9 +37,29 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         ("ط§ظ„ظ‡ظˆظٹط©", {"fields": ("site_name", "tagline", "logo", "favicon", "branding_preview", "header_cta_label", "header_cta_url")}),
         (
             "SEO ط§ظ„ط§ظپطھط±ط§ط¶ظٹ",
-            {"fields": ("default_title", "default_description", "default_keywords", "og_image", "canonical_domain")},
+            {
+                "fields": (
+                    "default_title",
+                    "default_description",
+                    "default_keywords",
+                    "og_image",
+                    "canonical_domain",
+                    "google_site_verification",
+                )
+            },
         ),
-        ("ط£ظƒظˆط§ط¯ ظˆطھظ†ط¨ظٹظ‡ط§طھ", {"fields": ("analytics_code", "maintenance_message")}),
+        (
+            "ط£ظƒظˆط§ط¯ ظˆطھظ†ط¨ظٹظ‡ط§طھ",
+            {
+                "fields": (
+                    "analytics_code",
+                    "custom_head_code",
+                    "verification_file_name",
+                    "verification_file_content",
+                    "maintenance_message",
+                )
+            },
+        ),
     )
     readonly_fields = ("branding_preview",)
 
@@ -289,6 +310,16 @@ class VisitEventAdmin(admin.ModelAdmin):
         "is_staff_request",
         "visited_at",
     )
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(StoredMediaFile)
+class StoredMediaFileAdmin(admin.ModelAdmin):
+    list_display = ("file_key", "content_type", "size", "updated_at")
+    search_fields = ("file_key", "original_name", "content_type")
+    readonly_fields = ("file_key", "original_name", "content_type", "size", "created_at", "updated_at")
 
     def has_add_permission(self, request):
         return False

@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page_title }} | {{ site_settings.site_name }}</title>
   <meta name="robots" content="noindex,nofollow">
+  {% if site_settings.google_site_verification %}
+    <meta name="google-site-verification" content="{{ site_settings.google_site_verification }}">
+  {% endif %}
   {% if site_settings.favicon %}
     <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}">
     <link rel="shortcut icon" href="{{ site_settings.favicon.url }}">
@@ -14,6 +17,9 @@
   {% endif %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="{% static 'css/dashboard-admin.css' %}">
+  {% if site_settings.custom_head_code %}
+    {{ site_settings.custom_head_code|safe }}
+  {% endif %}
 </head>
 <body class="dashboard-admin-body">
   <div class="dashboard-admin-shell">
